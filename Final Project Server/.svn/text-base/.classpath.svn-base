@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-0.9.9.4-SNAPSHOT/spark-0.9.9.4-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-0.9.9.4-SNAPSHOT/spark-0.9.9.4-SNAPSHOT-javadoc.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-0.9.9.4-SNAPSHOT/spark-0.9.9.4-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies/jetty-6.0.0beta6.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies/servlet-api-3.0.pre4.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/jetty-webapp-7.3.0.v20110203.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.1_and_newer/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/jetty-webapp-7.3.0.v20110203.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/servlet-api-3.0.pre4.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/JSON/java-json.jar"/>
+	<classpathentry kind="lib" path="/home/students/sjr090/work/SSC2/DBex2/google-play-services_lib/libs/google-play-services.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

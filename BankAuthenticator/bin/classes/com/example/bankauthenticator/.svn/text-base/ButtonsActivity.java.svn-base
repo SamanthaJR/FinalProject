@@ -1,0 +1,61 @@
+package com.example.bankauthenticator;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+
+public class ButtonsActivity extends Activity {
+
+	public static String loginAccepted;
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+}
+
+//public class ButtonsActivity extends Activity{
+//	
+//	public static String loginAccepted;
+//	
+//	@Override
+//	protected void onCreate(Bundle savedInstanceState) {
+//		
+//		super.onCreate(savedInstanceState);
+//		setContentView(R.layout.activity_buttons);
+//		
+//		Button acc = (Button) findViewById(R.id.yes_button);
+//		Button dec = (Button) findViewById(R.id.no_button);
+//
+//		acc.setVisibility(0);
+//		acc.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				loginAccepted = "Y";
+//			}
+//		});
+//
+//		dec.setVisibility(0);
+//		dec.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				loginAccepted = "N";
+//			}
+//		});
+//	}
+//	
+//	@Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.activity_buttons, menu);
+//        return true;
+//    }
+//
+//}

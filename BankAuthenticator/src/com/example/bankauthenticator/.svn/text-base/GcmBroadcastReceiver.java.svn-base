@@ -1,0 +1,117 @@
+package com.example.bankauthenticator;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.Button;
+
+public class GcmBroadcastReceiver extends BroadcastReceiver{
+	static final String TAG = "BankAuthenticator";
+	public static final int NOTIFICATION_ID = 1;
+	private NotificationManager mNotificationManager;
+	NotificationCompat.Builder builder;
+	Context ctx;
+	private AppClient mAppClient;
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		
+		Log.d("BroadcastReceiver", "onReceive method called");
+		
+        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+        ctx = context;
+        String messageType = gcm.getMessageType(intent);
+        if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+            sendNotification("Send error: " + intent.getExtras().toString()
+            		);
+        } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
+            sendNotification("Deleted messages on server: " + intent.getExtras().toString());
+        } else {
+        	
+            new connectTask().execute("");
+            
+            sendNotification("Connected to Server.");
+
+            
+            Button acc = (Button) ((Activity) context).findViewById(R.id.yes_button);
+            acc.setVisibility(0);
+            
+            Button dec = (Button) ((Activity) context).findViewById(R.id.no_button);
+            dec.setVisibility(0);
+
+            
+//            while(ButtonsActivity.loginAccepted == null){}
+//            
+//            if(ButtonsActivity.loginAccepted == "Y"){
+//            	 mAppClient.sendMessage("Accepted");
+//            }else if(ButtonsActivity.loginAccepted == "N"){
+//           	 mAppClient.sendMessage("Declined");
+//            } else {
+//            	Log.wtf(TAG, "Wrong string from button click. Why?");
+//            }
+            
+            
+            
+//            ("Received: " + intent.getExtras().toString() + "Connected to Server.");
+         
+        }
+        setResultCode(Activity.RESULT_OK);
+    }
+
+
+	// Put the GCM message into a notification and post it.
+	public void sendNotification(String msg) {
+		mNotificationManager = (NotificationManager) ctx
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
+				new Intent(ctx, MainActivity.class), 0);
+
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				ctx)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle("GCM Notification")
+//				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+				.setContentText(msg);
+
+		mBuilder.setContentIntent(contentIntent);
+		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+	}
+	
+	
+
+
+	
+	public class connectTask extends AsyncTask<String,String,AppClient> {
+		 
+        @Override
+        protected AppClient doInBackground(String... message) {
+ 
+            //we create a TCPClient object and
+            mAppClient = new AppClient(ctx);
+            mAppClient.run();
+ 
+            return null;
+        }
+ 
+//        @Override
+//        protected void onProgressUpdate(String... values) {
+//            super.onProgressUpdate(values);
+// 
+//            //in the arrayList we add the messaged received from server
+//            arrayList.add(values[0]);
+//            // notify the adapter that the data set has changed. This means that new message received
+//            // from server was added to the list
+//            mAdapter.notifyDataSetChanged();
+//        }
+    }
+}
