@@ -29,13 +29,20 @@ public class AppClient {
 	 */
 	public void sendMessage(String message) {
 		if (out != null && !out.checkError()) {
-			out.println(message);
+			out.print(message);
 			out.flush();
 		}
 	}
 
 	public void stopClient() {
 		mRun = false;
+		try {
+			out.close();
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("AHS: Error closing socket");
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
@@ -80,13 +87,6 @@ public class AppClient {
 		} catch (Exception e) {
 			System.out.println("AppClient: ");
 			e.printStackTrace();
-		} finally {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				System.out.println("AppClientFinally: ");
-				e.printStackTrace();
-			}
 		}
 
 	}
