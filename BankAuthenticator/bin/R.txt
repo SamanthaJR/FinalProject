@@ -77,6 +77,7 @@ int string auth_client_needs_update_title 0x7f060016
 int string auth_client_play_services_err_notification_msg 0x7f060017
 int string auth_client_requested_by_msg 0x7f060018
 int string auth_client_using_bad_version_title 0x7f060013
+int string choose_button 0x7f06001f
 int string common_google_play_services_enable_button 0x7f060006
 int string common_google_play_services_enable_text 0x7f060005
 int string common_google_play_services_enable_title 0x7f060004
