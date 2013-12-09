@@ -4,12 +4,13 @@ package serverPackage;
 public class ServerProtocol {
 
 	private static GCMServer gcm;
-	private AppHomeServer ahs;
+	public String decision;
+	public AppHomeServer ahs;
+	
 
 	public ServerProtocol(AppHomeServer ahs){
-		
-		gcm = new GCMServer();
 		this.ahs = ahs;
+		gcm = new GCMServer();
 	}
 	
 	/**
@@ -20,18 +21,34 @@ public class ServerProtocol {
 	 */
 	public boolean authenticate(String u, String p) {
 		if(u.contentEquals("SamanthaJR") && p.contentEquals("123")){
-			String response = gcm.postToGCM();
-//			System.out.println(response);
-			while(ahs.decision == null){}
-			if(ahs.decision.equalsIgnoreCase("true")){
+			ahs.setProto(this);
+			gcm.postToGCM();
+			
+			while (decision == null){
+				System.out.println("Decision still equals NUll");
+			}
+			
+			System.out.println(decision);
+			if(decision.equalsIgnoreCase("true")){
+//				setDecision("waiting");
 				return true;
 			} else {
+//				setDecision("waiting");
 				return false;
 			}
 		}else{
 			return false;
 		}
 		
+	}
+
+	/**
+	 * set method that changes the class variable 'decision' which encapulates the user's decision on whether or not they wish
+	 * to allow login.
+	 * @param b - the boolean we wish to set bool 'decision' to equal.
+	 */
+	public void setDecision(String b) {
+		decision = b;
 	}
 	
 	

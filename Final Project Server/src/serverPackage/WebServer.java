@@ -53,7 +53,7 @@ public class WebServer {
         	if (!authenticated) {
                 halt(401, "You are not welcome here");
         	}
-			return "Checking Phone Authentication...";
+			return "Login successful. Welcome!";
         }
      });
 	
