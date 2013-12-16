@@ -1,45 +1,46 @@
 package serverPackage;
 
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+
 
 public class ServerProtocol {
 
 	private static GCMServer gcm;
-	public String decision;
+	public boolean decision;
 	public AppHomeServer ahs;
+	public ArrayList<ResponseEvent> responses = new ArrayList<ResponseEvent>();
+	private CountDownLatch block;
+	public String id = "APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4";
 	
-
 	public ServerProtocol(AppHomeServer ahs){
 		this.ahs = ahs;
 		gcm = new GCMServer();
+		block = new CountDownLatch(1);
 	}
 	
 	/**
-	 * Authenticate method that ensures that the correct username and passowrd combination have been entered
+	 * Authenticate method that ensures that the correct username and password combination have been entered
 	 * @param u the username (Note this is currently hardcoded to expect only a single correct string of "SamanthJR")
 	 * @param p the password (Note this is currently hardcoded to expect only a single correct string of "123"
 	 * @return true if correct password/username combination. False if not.
 	 */
 	public boolean authenticate(String u, String p) {
-		if(u.contentEquals("SamanthaJR") && p.contentEquals("123")){
-			ahs.setProto(this);
+		if (u.contentEquals("SamanthaJR") && p.contentEquals("123")) {
+			ahs.setId(this);
 			gcm.postToGCM();
 			
-			while (decision == null){
-				System.out.println("Decision still equals NUll");
-			}
-			
-			System.out.println(decision);
-			if(decision.equalsIgnoreCase("true")){
-//				setDecision("waiting");
-				return true;
-			} else {
-//				setDecision("waiting");
+			try {
+				block.await();
+			} catch (InterruptedException e) {
+				System.out.println("Proto: ");
+				e.printStackTrace();
 				return false;
 			}
-		}else{
-			return false;
+			
 		}
 		
+		return decision;
 	}
 
 	/**
@@ -47,9 +48,16 @@ public class ServerProtocol {
 	 * to allow login.
 	 * @param b - the boolean we wish to set bool 'decision' to equal.
 	 */
-	public void setDecision(String b) {
+	public void setDecision(boolean b) {
 		decision = b;
 	}
 	
-	
+	public void responseReceived(ResponseEvent resp) {
+		setDecision(resp.getResponse());
+		block.countDown();
+	}
+
+	public String getId() {
+		return id;
+	}
 }

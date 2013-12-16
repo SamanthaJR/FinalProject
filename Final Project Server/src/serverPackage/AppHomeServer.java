@@ -3,56 +3,60 @@ package serverPackage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.Stack;
 
 public class AppHomeServer {
 
 	public static String decision;
-	public ServerProtocol proto;
+	public static Stack <ServerProtocol>  listenerQueue = new Stack <ServerProtocol>();
 
 	public void startServer() {
 
-		try {
-			ServerSocket listener = new ServerSocket(4444);
-			System.out.println("AHS: Started, Listening to port 4444");
-			Socket server;
+		while (true) {
+			try {
 
-			// doComms connection;
+				ServerSocket listener = new ServerSocket(4444);
+				System.out.println("AHS: Started, Listening to port 4444");
+				Socket server;
 
-			server = listener.accept();
-			System.out.println("AHS: AppClient accepted.");
-			if (proto != null) {
-				doComms conn_c = new doComms(server, proto);
+				// doComms connection;
+
+				server = listener.accept();
+				System.out.println("AHS: AppClient accepted.");
+
+				doComms conn_c = new doComms(server);
 				Thread t = new Thread(conn_c);
 				t.start();
-				proto = null;
-			}
 
-		} catch (IOException ioe) {
-			System.out.println("AHS: Listen error " + ioe);
-			ioe.printStackTrace();
+			} catch (IOException ioe) {
+				System.out.println("AHS: Listen error " + ioe);
+				ioe.printStackTrace();
+			}
 		}
 	}
 
-	public void setProto(ServerProtocol p) {
-		proto = p;
+	public void setId(ServerProtocol rl) {
+		listenerQueue.add(rl);
 	}
 
 }
 
 class doComms implements Runnable {
 	private Socket server;
-	private ServerProtocol proto;
-	private char[] line, resp;
+	private char[] line, resp, regid;
 
-	public doComms(Socket server, ServerProtocol proto) {
+	public doComms(Socket server) {
 		this.server = server;
-		this.proto = proto;
 	}
 
 	public void run() {
 
 		line = new char[12];
 		resp = new char[8];
+		regid = new char[183];
 
 		try {
 			// Get input from the client
@@ -72,6 +76,13 @@ class doComms implements Runnable {
 				throw new UnexpectedClientMessageException(
 						"Handshake incorrect.");
 
+
+			is.read(regid, 0, 183);
+			
+			String id = String.valueOf(regid);
+			
+			System.out.println(id);
+			
 			System.out.println("Waiting for response");
 
 			is.read(resp, 0, 8);
@@ -79,14 +90,15 @@ class doComms implements Runnable {
 			System.out.println(String.valueOf(resp));
 
 			System.out.println("Message received:" + String.valueOf(resp));
+			
 
 			if (checkMessage(resp, "Accepted")) {
 				AppHomeServer.decision = "true";
-				proto.setDecision("true");
+				fireResponseEvent(true, id);
 				System.out.println("Accepted login!");
 			} else if (checkMessage(resp, "Declined")) {
 				AppHomeServer.decision = "false";
-				proto.setDecision("false");
+				fireResponseEvent(false, id);
 				System.out.println("Declined login!");
 			}
 
@@ -108,6 +120,21 @@ class doComms implements Runnable {
 		}
 	}
 
+	private synchronized void fireResponseEvent(boolean b, String id) {
+		String ident = id;
+		Stack <ServerProtocol> temp = new Stack<ServerProtocol>();
+		ResponseEvent response = new ResponseEvent(this, ident, b);
+		ServerProtocol rl = AppHomeServer.listenerQueue.pop();
+		while (rl.getId().equalsIgnoreCase(id) == false){
+			temp.push(rl);
+		}
+		rl.responseReceived(response);
+		while(temp.empty() == false){
+			ServerProtocol next = temp.pop();
+			AppHomeServer.listenerQueue.push(next);
+		}
+	}
+
 	/**
 	 * Method assesses both parameter Strings are equal.
 	 * 
@@ -125,184 +152,3 @@ class doComms implements Runnable {
 		}
 	}
 }
-
-//
-// public class AppHomeServer{
-//
-// private ServerSocket serverSocket;
-// private Socket clientSocket;
-// private InputStreamReader inputStreamReader;
-// private BufferedReader bufferedReader;
-// private PrintWriter printWriter;
-// private String message;
-// public boolean decision;
-//
-// public void startServer() throws UnexpectedClientMessageException {
-//
-// try {
-// serverSocket = new ServerSocket(4444);
-//
-// } catch (IOException e) {
-// System.out.println("Could not listen on port: 4444");
-// }
-//
-// System.out.println("AppHomeServer started. Listening to the port 4444");
-//
-// while (true) {
-// try {
-// clientSocket = serverSocket.accept();
-// System.out.println("AppClient accepted.");
-// inputStreamReader = new InputStreamReader(clientSocket.getInputStream());
-// bufferedReader = new BufferedReader(inputStreamReader);
-// printWriter= new PrintWriter(new BufferedWriter(new
-// OutputStreamWriter(clientSocket.getOutputStream())));
-//
-// sendServerMessage("Hello Client");
-// System.out.println("Handshake sent.");
-//
-// message = bufferedReader.readLine();
-//
-// System.out.println(message);
-//
-// if (checkMessage("Hello Server", message)){
-// System.out.println(message);
-// } else {
-// throw new UnexpectedClientMessageException("Unexpected message from Client."
-// + message);
-// }
-//
-// decision = loginAcceptedByUser(bufferedReader.readLine());
-//
-// sendServerMessage("Goodbye Client//
-// public class AppHomeServer{
-//
-// private ServerSocket serverSocket;
-// private Socket clientSocket;
-// private InputStreamReader inputStreamReader;
-// private BufferedReader bufferedReader;
-// private PrintWriter printWriter;
-// private String message;
-// public boolean decision;
-//
-// public void startServer() throws UnexpectedClientMessageException {
-//
-// try {
-// serverSocket = new ServerSocket(4444);
-//
-// } catch (IOException e) {
-// System.out.println("Could not listen on port: 4444");
-// }
-//
-// System.out.println("AppHomeServer started. Listening to the port 4444");
-//
-// while (true) {
-// try {
-// clientSocket = serverSocket.accept();
-// System.out.println("AppClient accepted.");
-// inputStreamReader = new InputStreamReader(clientSocket.getInputStream());
-// bufferedReader = new BufferedReader(inputStreamReader);
-// printWriter= new PrintWriter(new BufferedWriter(new
-// OutputStreamWriter(clientSocket.getOutputStream())));
-//
-// sendServerMessage("Hello Client");
-// System.out.println("Handshake sent.");
-//
-// message = bufferedReader.readLine();
-//
-// System.out.println(message);
-//
-// if (checkMessage("Hello Server", message)){
-// System.out.println(message);
-// } else {
-// throw new UnexpectedClientMessageException("Unexpected message from Client."
-// + message);
-// }
-//
-// decision = loginAcceptedByUser(bufferedReader.readLine());
-//
-// sendServerMessage("Goodbye Client");
-//
-// inputStreamReader.close();
-// clientSocket.close();
-//
-// } catch (IOException ex) {
-// System.out.println("Problem in message reading");
-// }
-// }
-//
-// }
-//
-// /**
-// * Method assesses both parameter Strings are equal.
-// * @param string The expected message from the Client.
-// * @param string1 The actual message from the Client.
-// * @return boolean true if they match, false if not.
-// */
-// private boolean checkMessage(String string, String string1) throws
-// UnexpectedClientMessageException {
-// if (string.equals(string1)){
-// return true;
-// } else {");
-//
-// inputStreamReader.close();
-// clientSocket.close();
-//
-// } catch (IOException ex) {
-// System.out.println("Problem in message reading");
-// }
-// }
-//
-// }
-//
-// /**
-// * Method assesses both parameter Strings are equal.
-// * @param string The expected message from the Client.
-// * @param string1 The actual message from the Client.
-// * @return boolean true if they match, false if not.
-// */
-// private boolean checkMessage(String string, String string1) throws
-// UnexpectedClientMessageException {
-// if (string.equals(string1)){
-// return true;
-// } else {
-// return false;
-// }
-// }
-//
-// /**
-// * Sends a message to the client
-// * @param message - the message we wish to send
-// */
-// public void sendServerMessage(String message){
-// printWriter.print(message);
-// }
-//
-// public boolean loginAcceptedByUser(String message) {
-// try {
-// if(checkMessage("Accepted", message)){
-// return true;
-// } else {
-// return false;
-// }
-// } catch (Exception e) {
-// System.out.println("AHS: ");
-// e.printStackTrace();
-// return false;
-// }
-// }
-//
-//
-//
-// // public static void main(String[] args){
-// // AppHomeServer ahs = new AppHomeServer();
-// // try {
-// // ahs.startServer();
-// // } catch (UnexpectedClientMessageException e) {
-// // System.out.println("AHS Main: ");
-// // e.printStackTrace();
-// // }
-// // }
-// //
-//
-//
-// }

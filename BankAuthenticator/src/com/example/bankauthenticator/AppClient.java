@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class AppClient {
 
@@ -76,6 +77,7 @@ public class AppClient {
 
 				if (serverMessage.equals("Hello Client")){
 					sendMessage("Hello Server");
+					sendMessage("APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4");
 				} else if (serverMessage.equals("Goodbye Client")){
 					Log.d("AC: ", serverMessage);
 					stopClient();

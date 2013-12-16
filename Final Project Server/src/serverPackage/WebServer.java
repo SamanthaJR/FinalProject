@@ -12,21 +12,22 @@ public class WebServer {
 	private static boolean authenticated = false;
 	private static ServerProtocol proto;
 	private static AppHomeServer ahs;
+	
 
 
 	public static void main(String[] args) {
-		
+
 		ahs = new AppHomeServer();
 		startAHS sAHS = new startAHS(ahs);
 		Thread t = new Thread(sAHS);
-		t.start();
-		proto = new ServerProtocol(ahs);	
+		t.start();	
+
 		
 	  // First Spark get method returns a simple webpage with two text entry boxes: one for username and one for password.
     get(new Route("/hello") {
       @Override
       public Object handle(Request request, Response response) {
-
+    	  
         response.type("text/html");
 
         return "" +
@@ -47,8 +48,11 @@ public class WebServer {
    post(new Route("/goto") {
         @Override
         public Object handle(Request request, Response response) {
+
+
         	String username = request.queryMap().get("user").value();
         	String pass = request.queryMap().get("pwd").value();
+        	proto = new ServerProtocol(ahs);
         	authenticated = proto.authenticate(username, pass);
         	if (!authenticated) {
                 halt(401, "You are not welcome here");
