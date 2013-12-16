@@ -2,6 +2,7 @@ package com.example.bankauthenticator;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -23,14 +24,17 @@ public class ButtonActivity extends Activity {
 		acc.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				GcmBroadcastReceiver.mAppClient.sendMessage("Accepted");;
+				GcmBroadcastReceiver.mAppClient.sendMessage("Accepted");
+				startMainAct();
 			}
+
 		});
 
 		dec.setVisibility(0);
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				startMainAct();
 				GcmBroadcastReceiver.mAppClient.sendMessage("Declined");
 			}
 		});
@@ -44,4 +48,11 @@ public class ButtonActivity extends Activity {
 		return true;
 	}
 
+	private void startMainAct() {
+		Intent myIntent = new Intent(this, MainActivity.class);
+        myIntent.setClassName("com.example.bankauthenticator", "com.example.bankauthenticator.MainActivity");
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(myIntent);
+	}
+	
 }
