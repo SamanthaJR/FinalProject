@@ -11,17 +11,16 @@ import java.util.Stack;
 public class AppHomeServer {
 
 	public static String decision;
-	public static Stack <ServerProtocol>  listenerQueue = new Stack <ServerProtocol>();
+	public static Stack<ServerProtocol> listenerQueue = new Stack<ServerProtocol>();
 
 	public void startServer() {
 
-		while (true) {
-			try {
+		try {
 
-				ServerSocket listener = new ServerSocket(4444);
-				System.out.println("AHS: Started, Listening to port 4444");
-				Socket server;
-
+			ServerSocket listener = new ServerSocket(4444);
+			System.out.println("AHS: Started, Listening to port 4444");
+			Socket server;
+			while (true) {
 				// doComms connection;
 
 				server = listener.accept();
@@ -30,11 +29,11 @@ public class AppHomeServer {
 				doComms conn_c = new doComms(server);
 				Thread t = new Thread(conn_c);
 				t.start();
-
-			} catch (IOException ioe) {
-				System.out.println("AHS: Listen error " + ioe);
-				ioe.printStackTrace();
 			}
+
+		} catch (IOException ioe) {
+			System.out.println("AHS: Listen error " + ioe);
+			ioe.printStackTrace();
 		}
 	}
 
@@ -46,7 +45,7 @@ public class AppHomeServer {
 
 class doComms implements Runnable {
 	private Socket server;
-	private char[] line, resp, regid;
+	private char[] line, resp, task, regid, len, details;
 
 	public doComms(Socket server) {
 		this.server = server;
@@ -57,6 +56,8 @@ class doComms implements Runnable {
 		line = new char[12];
 		resp = new char[8];
 		regid = new char[183];
+		task = new char[11];
+		len = new char[3];
 
 		try {
 			// Get input from the client
@@ -76,31 +77,51 @@ class doComms implements Runnable {
 				throw new UnexpectedClientMessageException(
 						"Handshake incorrect.");
 
+			// read if registering or logging in
+			is.read(task, 0, 11);
 
-			is.read(regid, 0, 183);
-			
-			String id = String.valueOf(regid);
-			
-			System.out.println(id);
-			
-			System.out.println("Waiting for response");
+			if (checkMessage(task, "registering")) {
+				System.out.println("Registering");
 
-			is.read(resp, 0, 8);
+				is.read(len, 0, 3);
+				System.out.println(Integer.parseInt(new String(len)));
+				int length = Integer.parseInt(new String(len));
+				details = new char[length];
+				is.read(details, 0, length);
+				String regDetails = String.valueOf(details);
+				System.out.println(regDetails);
+				String[] regDetArr = regDetails.split("^");
 
-			System.out.println(String.valueOf(resp));
+				// check database note that don't say username already taken if
+				// it is that device already registered under it
 
-			System.out.println("Message received:" + String.valueOf(resp));
-			
+				// send appropriate reply ("Already Registered Client" ,
+				// "Username Taken Client", "Goodbye Client")
 
-			if (checkMessage(resp, "Accepted")) {
-				AppHomeServer.decision = "true";
-				fireResponseEvent(true, id);
-				System.out.println("Accepted login!");
-			} else if (checkMessage(resp, "Declined")) {
-				AppHomeServer.decision = "false";
-				fireResponseEvent(false, id);
-				System.out.println("Declined login!");
-			}
+			} else if (checkMessage(task, "user log in")) {
+				System.out.println("Authenticating");
+				// read registration id
+				is.read(regid, 0, 183);
+				String id = String.valueOf(regid);
+				System.out.println(id);
+				System.out.println("Waiting for response");
+
+				// read accept or decline
+				is.read(resp, 0, 8);
+				System.out.println(String.valueOf(resp));
+				System.out.println("Message received:" + String.valueOf(resp));
+
+				if (checkMessage(resp, "Accepted")) {
+					AppHomeServer.decision = "true";
+					fireResponseEvent(true, id);
+					System.out.println("Accepted login!");
+				} else if (checkMessage(resp, "Declined")) {
+					AppHomeServer.decision = "false";
+					fireResponseEvent(false, id);
+					System.out.println("Declined login!");
+				}
+			} else
+				throw new UnexpectedClientMessageException("Task incorrect.");
 
 			out.println("Goodbye Client");
 
@@ -122,14 +143,14 @@ class doComms implements Runnable {
 
 	private synchronized void fireResponseEvent(boolean b, String id) {
 		String ident = id;
-		Stack <ServerProtocol> temp = new Stack<ServerProtocol>();
+		Stack<ServerProtocol> temp = new Stack<ServerProtocol>();
 		ResponseEvent response = new ResponseEvent(this, ident, b);
 		ServerProtocol rl = AppHomeServer.listenerQueue.pop();
-		while (rl.getId().equalsIgnoreCase(id) == false){
+		while (rl.getId().equalsIgnoreCase(id) == false) {
 			temp.push(rl);
 		}
 		rl.responseReceived(response);
-		while(temp.empty() == false){
+		while (temp.empty() == false) {
 			ServerProtocol next = temp.pop();
 			AppHomeServer.listenerQueue.push(next);
 		}

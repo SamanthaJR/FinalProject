@@ -43,8 +43,7 @@ public class GCMServer {
 		jsonArray.put(reg_id);
 
 		try {
-			obj.put("name", "foo");
-			obj.put("Cat", "test");
+			obj.put("regid", reg_id);
 //			System.out.println(obj.toString());
 			mess.put("delay_while_idle", false);
 			mess.put("data", obj);
