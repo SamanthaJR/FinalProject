@@ -8,5 +8,10 @@
     <string name="decline_string">Decline</string>
     <string name="title_activity_button">ButtonActivity</string>
     <string name="choose_button">Someone is attempting to login to you account? Do you wish to grant them access?</string>
+    <string name="welcome_message">Welcome to the SecureLock App. Please register your device if necessary.</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="submit_button_string">Submit</string>
 
 </resources>

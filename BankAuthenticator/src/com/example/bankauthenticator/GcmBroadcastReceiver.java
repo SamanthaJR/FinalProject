@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -24,6 +25,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
 	Button acc;
 	Button dec;
 	static String loginAccepted = "Wait";
+	String regid;
 
 	
 	@Override
@@ -41,6 +43,10 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
             sendNotification("Deleted messages on server: " + intent.getExtras().toString());
         } else {
         	
+        	String temp = intent.getExtras().toString();
+        	int leng = temp.length() - 183;
+        	regid = temp.substring(32, (32 + 183) );
+        	
             new connectTask().execute("");
             
             sendNotification("Connected to Server.");
@@ -50,19 +56,6 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
             myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             
             context.startActivity(myIntent);
-//            
-//            while(loginAccepted.equalsIgnoreCase("Wait")){} // TODO BUSY WAITING!!! BAD!!!
-//            
-//            if(loginAccepted.equalsIgnoreCase("Y")){
-//            	mAppClient.sendMessage("Accepted");
-//            	loginAccepted = "Wait";
-//            } else if (loginAccepted.equalsIgnoreCase("N")){
-//            	mAppClient.sendMessage("Declined");
-//            	loginAccepted = "Wait";
-//            }
-//            	
-            
-//            ("Received: " + intent.getExtras().toString() + "Connected to Server.");
          
         }
         setResultCode(Activity.RESULT_OK);
@@ -76,6 +69,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
 
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
 				new Intent(context, MainActivity.class), 0);
+		
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				context)
@@ -97,20 +91,14 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
 		}
 	}
 	
-
-
-	
 	public class connectTask extends AsyncTask<String,String,AppClient> {
 		 
         @Override
         protected AppClient doInBackground(String... message) {
- 
-            //we create a TCPClient object and
-            mAppClient = new AppClient();
+            mAppClient = new AppClient(context, true, 0, regid, "", "");  
             mAppClient.run();
  
             return null;
         }
-
     }
 }

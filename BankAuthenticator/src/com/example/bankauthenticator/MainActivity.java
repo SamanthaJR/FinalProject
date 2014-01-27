@@ -20,7 +20,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bankauthenticator.GcmBroadcastReceiver.connectTask;
 import com.google.android.gms.common.*;
@@ -42,6 +44,8 @@ public class MainActivity extends Activity {
 	NotificationCompat.Builder builder;
 	Context ctx;
 	private AppClient mAppClient;
+	String usernm, pass;
+	int regLen;
 
 	TextView mDisplay;
 	GoogleCloudMessaging gcm;
@@ -49,17 +53,24 @@ public class MainActivity extends Activity {
 	SharedPreferences prefs;
 	Context context;
 	String regid;
+	Button mSubmitBtn;
+	EditText mUsername, mPassword, mConfPass;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-			context = getApplicationContext();
-			regid = getRegistrationId(context);
-			System.out.println(regid);
-			TextView dispID = (TextView) findViewById(R.id.display);
-			dispID.setText(regid);
+
+		mUsername = (EditText) findViewById(R.id.username);
+		mPassword = (EditText) findViewById(R.id.password);
+		mConfPass = (EditText) findViewById(R.id.confirm_password);
+		mSubmitBtn = (Button) findViewById(R.id.submit_button);
+
+		context = getApplicationContext();
+		regid = getRegistrationId(context);
+		System.out.println(regid);
+		TextView dispID = (TextView) findViewById(R.id.display);
+		dispID.setText(regid);
 
 		if (checkPlay()) {
 			gcm = GoogleCloudMessaging.getInstance(this);
@@ -225,9 +236,53 @@ public class MainActivity extends Activity {
 		}
 		return true;
 	}
-	
-	public void setConnected(boolean set){
+
+	public void setConnected(boolean set) {
 		connected = set;
 	}
 
+	public void submitClick(View view) {
+
+		usernm = mUsername.getText().toString();
+		pass = mPassword.getText().toString();
+		String cPass = mConfPass.getText().toString();
+
+		if (!pass.equals(cPass)) {
+
+			launchToast("Make sure you have typed your password correctly!");
+
+			mPassword.setText("");
+			mConfPass.setText("");
+		} else {
+			// calc lengths of vals from text zones
+			int usernmLen = usernm.length();
+			int passLen = pass.length();
+			regLen = 183 + usernmLen + passLen + 2;
+
+			new connectRegTask().execute("");
+		}
+	}
+
+	public void launchToast(String toastMess) {
+		Context context = getApplicationContext();
+		CharSequence text = toastMess;
+		int duration = Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.show();
+	}
+
+	public class connectRegTask extends AsyncTask<String, String, AppClient> {
+
+		@Override
+		protected AppClient doInBackground(String... message) {
+
+			// we create a TCPClient object and
+			mAppClient = new AppClient(getApplicationContext(), false, regLen,
+					regid, usernm, pass);
+			mAppClient.run();
+
+			return null;
+		}
+
+	}
 }

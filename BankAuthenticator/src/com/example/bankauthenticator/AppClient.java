@@ -2,6 +2,7 @@ package com.example.bankauthenticator;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -15,11 +16,21 @@ public class AppClient {
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
 	private Socket socket;
-	
+	Context cntx;
+	boolean authenticating;
+	String regid, username, password;
+	int length;
+
 	PrintWriter out;
 	BufferedReader in;
 
-	public AppClient() {
+	public AppClient(Context cntx, boolean authenticating, int length, String regid, String username, String password) {
+		this.cntx = cntx;
+		this.authenticating = authenticating;
+		this.regid = regid;
+		this.length = length;
+		this.username = username;
+		this.password = password;
 	}
 
 	/**
@@ -29,6 +40,13 @@ public class AppClient {
 	 *            text entered by client
 	 */
 	public void sendMessage(String message) {
+		if (out != null && !out.checkError()) {
+			out.print(message);
+			out.flush();
+		}
+	}
+	
+	public void sendIntMessage(int message) {
 		if (out != null && !out.checkError()) {
 			out.print(message);
 			out.flush();
@@ -60,31 +78,49 @@ public class AppClient {
 			socket = new Socket(serverAddr, SERVERPORT);
 
 			// send the message to the server
-			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+					socket.getOutputStream())), true);
 
 			Log.e("AppC", "C: Sent.");
 
 			Log.e("AppC", "C: Done.");
 
 			// receive the message which the server sends back
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
 
-			// in this while the client listens for the messages sent by the
-			// server
-				Log.d("AC: ", "we got this far");
-				serverMessage = in.readLine();
-				Log.d("AC: ", serverMessage);
+			Log.d("AC: ", "we got this far");
+			serverMessage = in.readLine();
+			Log.d("AC: ", serverMessage);
 
-				if (serverMessage.equals("Hello Client")){
-					sendMessage("Hello Server");
-					sendMessage("APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4");
-				} else if (serverMessage.equals("Goodbye Client")){
-					Log.d("AC: ", serverMessage);
-					stopClient();
+			if (serverMessage.equals("Hello Client")) {
+				sendMessage("Hello Server");
+
+				if (authenticating) {
+					sendMessage("user log in");
+					sendMessage(regid);
+				} else {
+					sendMessage("registering");
+					Log.d("AC: ", Integer.toString(length));
+					sendIntMessage(length);
+					sendMessage(regid + '^' + username + '^' + password);
 				}
 
-			Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
-					+ serverMessage + "'");
+			} else if (serverMessage.equals("Goodbye Client")) {
+				Log.d("AC: ", serverMessage);
+				stopClient();
+			} else  if (serverMessage.equals("Already Registered Client")) {
+                Log.d("AC: ", serverMessage);
+                launchClientToast("This deivce has already been registered.");
+                stopClient();
+            } else if (serverMessage.equals("Username Taken Client")) {
+                Log.d("AC: ", serverMessage);
+                launchClientToast("This username has already been taken, please select another and try again");
+                stopClient();
+            }
+
+//			Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
+//					+ serverMessage + "'");
 
 		} catch (Exception e) {
 			System.out.println("AppClient: ");
@@ -92,4 +128,12 @@ public class AppClient {
 		}
 
 	}
+
+	private void launchClientToast(String string) {
+		CharSequence text = string;
+		int duration = Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(cntx, text, duration);
+		toast.show();
+	}
+
 }
