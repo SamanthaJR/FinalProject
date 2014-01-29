@@ -1,6 +1,7 @@
 package com.example.bankauthenticator;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,7 +25,8 @@ public class AppClient {
 	PrintWriter out;
 	BufferedReader in;
 
-	public AppClient(Context cntx, boolean authenticating, int length, String regid, String username, String password) {
+	public AppClient(Context cntx, boolean authenticating, int length,
+			String regid, String username, String password) {
 		this.cntx = cntx;
 		this.authenticating = authenticating;
 		this.regid = regid;
@@ -45,7 +47,7 @@ public class AppClient {
 			out.flush();
 		}
 	}
-	
+
 	public void sendIntMessage(int message) {
 		if (out != null && !out.checkError()) {
 			out.print(message);
@@ -90,50 +92,73 @@ public class AppClient {
 					socket.getInputStream()));
 
 			Log.d("AC: ", "we got this far");
-			serverMessage = in.readLine();
-			Log.d("AC: ", serverMessage);
+			while (mRun) {
 
-			if (serverMessage.equals("Hello Client")) {
-				sendMessage("Hello Server");
-
-				if (authenticating) {
-					sendMessage("user log in");
-					sendMessage(regid);
-				} else {
-					sendMessage("registering");
-					Log.d("AC: ", Integer.toString(length));
-					sendIntMessage(length);
-					sendMessage(regid + '^' + username + '^' + password);
-				}
-
-			} else if (serverMessage.equals("Goodbye Client")) {
+				serverMessage = in.readLine();
 				Log.d("AC: ", serverMessage);
-				stopClient();
-			} else  if (serverMessage.equals("Already Registered Client")) {
-                Log.d("AC: ", serverMessage);
-                launchClientToast("This deivce has already been registered.");
-                stopClient();
-            } else if (serverMessage.equals("Username Taken Client")) {
-                Log.d("AC: ", serverMessage);
-                launchClientToast("This username has already been taken, please select another and try again");
-                stopClient();
-            }
 
-//			Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
-//					+ serverMessage + "'");
+				if (serverMessage.equals("Hello Client")) {
+					sendMessage("Hello Server");
+
+					if (authenticating) {
+						sendMessage("user log in");
+						sendMessage(regid);
+					} else {
+						sendMessage("registering");
+						Log.d("AC: ", Integer.toString(length));
+						sendIntMessage(length);
+						sendMessage(regid + '^' + username + '^' + password);
+					}
+
+				} else if (serverMessage.equals("Goodbye Client")) {
+					Log.d("AC: ", serverMessage);
+					stopClient();
+				} else if (serverMessage.equals("Already Registered Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().execute("Aready Registered");
+					stopClient();
+				} else if (serverMessage.equals("Username Taken Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().execute("Username Taken");
+					stopClient();
+				} else if (serverMessage
+						.equals("Succesful Registration Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().execute("Successfully Registered");
+				}
+			}
+
+			// Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
+			// + serverMessage + "'");
 
 		} catch (Exception e) {
-			System.out.println("AppClient: ");
+			Log.e("AppClient: ", e.toString());
 			e.printStackTrace();
 		}
 
 	}
 
-	private void launchClientToast(String string) {
-		CharSequence text = string;
-		int duration = Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(cntx, text, duration);
-		toast.show();
+	private class showToast extends AsyncTask<String, Void, CharSequence> {
+		CharSequence text;
+		@Override
+		protected CharSequence doInBackground(String... params) {
+			if(params[0].equalsIgnoreCase("Aready Registered")){
+				text = "This device has already been registered.";
+			} else if (params[0].equalsIgnoreCase("Username Taken")){
+				text = "This username has already been taken, please select another and try again.";
+			} else if (params[0].equalsIgnoreCase("Successfully Registered")){
+				text = "Registration Successful!";
+			}
+			return text;
+		}
+		
+		@Override
+		protected void onPostExecute(CharSequence text){
+			int duration = Toast.LENGTH_SHORT;
+			Toast toast = Toast.makeText(cntx, text, duration);
+			toast.show();
+		}
+		
 	}
 
 }

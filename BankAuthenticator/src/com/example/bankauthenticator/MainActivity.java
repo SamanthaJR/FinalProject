@@ -276,7 +276,7 @@ public class MainActivity extends Activity {
 		@Override
 		protected AppClient doInBackground(String... message) {
 
-			// we create a TCPClient object and
+			// we create a TCPClient object and pass to it all the data it needs.
 			mAppClient = new AppClient(getApplicationContext(), false, regLen,
 					regid, usernm, pass);
 			mAppClient.run();

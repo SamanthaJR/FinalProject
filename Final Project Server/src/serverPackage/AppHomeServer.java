@@ -3,17 +3,34 @@ package serverPackage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Queue;
+import java.sql.*;
+
+import javax.sql.*;
+
 import java.util.Stack;
 
 public class AppHomeServer {
 
 	public static String decision;
 	public static Stack<ServerProtocol> listenerQueue = new Stack<ServerProtocol>();
+	private Connection dbConn;
 
 	public void startServer() {
+		
+		System.setProperty("jdbc.drivers", "org.postgresql.Driver");
+		String dbName = "jdbc:postgresql://dbteach2/bankauth";
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e1) {
+			System.out.println("AHSQL: Could not find a Driver");
+			e1.printStackTrace();
+		}
+		try {
+			dbConn = DriverManager.getConnection(dbName, "sjr090", "nulumobo");
+		} catch (SQLException e) {
+			System.out.println("AHS: SQL database connection error");
+			e.printStackTrace();
+		}
 
 		try {
 
@@ -26,7 +43,7 @@ public class AppHomeServer {
 				server = listener.accept();
 				System.out.println("AHS: AppClient accepted.");
 
-				doComms conn_c = new doComms(server);
+				doComms conn_c = new doComms(server, dbConn);
 				Thread t = new Thread(conn_c);
 				t.start();
 			}
@@ -46,9 +63,11 @@ public class AppHomeServer {
 class doComms implements Runnable {
 	private Socket server;
 	private char[] line, resp, task, regid, len, details;
+	private Connection dbConn;
 
-	public doComms(Socket server) {
+	public doComms(Socket server, Connection dbConn) {
 		this.server = server;
+		this.dbConn = dbConn;
 	}
 
 	public void run() {
@@ -90,8 +109,34 @@ class doComms implements Runnable {
 				is.read(details, 0, length);
 				String regDetails = String.valueOf(details);
 				System.out.println(regDetails);
-				String[] regDetArr = regDetails.split("^");
+				String[] regDetArr = regDetails.split("\\^");
 
+				ResultSet regidSet = checkRegDetails(regDetArr[0]);
+				
+				if (regidSet != null){
+					try {
+						// if the device is already registered, statement is true
+						if(regidSet.next()){
+							out.println("Already Registered Client");
+							System.out.println("Already Registered Client");
+						} else {
+							ResultSet userSet = checkUsernmDetails(regDetArr[1]);
+							//if username already taken, statement is true
+							if(userSet.next()){
+								out.println("Username Taken Client");
+								System.out.println("Username Taken Client");
+							} else {
+								insertUserDetails(regDetArr[0], regDetArr[1], regDetArr[2]);
+								out.println("Succesful Registration Client");
+								System.out.println("Succesful Registration Client");
+							}
+						}
+					} catch (SQLException e) {
+						System.out.println("AHSQL: More SQL error catching");
+						e.printStackTrace();
+					}
+				}
+				
 				// check database note that don't say username already taken if
 				// it is that device already registered under it
 
@@ -139,6 +184,44 @@ class doComms implements Runnable {
 			System.out.println("Unexpected Client response");
 			e.printStackTrace();
 		}
+	}
+
+	private void insertUserDetails(String regid, String username, String password) throws SQLException {
+			PreparedStatement stmnt = dbConn.prepareStatement("INSERT INTO userinfo " + "(reg_id, user_name, password) " + "VALUES (?, ?, ?)");
+			stmnt.setString(1, regid);
+			stmnt.setString(2, username);
+			stmnt.setString(3, password);
+			stmnt.executeUpdate();
+	}
+
+	private ResultSet checkRegDetails(String regid) {
+		try {
+			PreparedStatement regDetails = dbConn.prepareStatement("SELECT * "
+					+ "FROM userinfo " + "WHERE reg_id = ? ");
+			regDetails.setString(1, regid);
+			ResultSet rs = regDetails.executeQuery();
+			return rs;
+
+		} catch (SQLException e) {
+			System.out.println("AHSThread: Problem creating or executing SQL Statement 1");
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private ResultSet checkUsernmDetails(String username) {
+		try {
+			PreparedStatement regDetails = dbConn.prepareStatement("SELECT * "
+					+ "FROM userInfo " + "WHERE user_name = ? ");
+			regDetails.setString(1, username);
+			ResultSet rs = regDetails.executeQuery();
+			return rs;
+
+		} catch (SQLException e) {
+			System.out.println("AHSThread: Problem creating or executing SQL Statement 2");
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private synchronized void fireResponseEvent(boolean b, String id) {

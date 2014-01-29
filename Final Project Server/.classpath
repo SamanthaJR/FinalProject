@@ -23,5 +23,6 @@
 	<classpathentry kind="lib" path="/home/students/sjr090/Spark/spark-dependencies_0.9.9.3_and_newer/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="lib" path="/home/students/sjr090/JSON/java-json.jar"/>
 	<classpathentry kind="lib" path="/home/students/sjr090/work/SSC2/DBex2/google-play-services_lib/libs/google-play-services.jar"/>
+	<classpathentry kind="lib" path="/home/students/ug/sjr090/Postgresql/postgresql-9.3-1100.jdbc3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
