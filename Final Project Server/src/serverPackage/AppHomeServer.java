@@ -7,12 +7,15 @@ import java.sql.*;
 
 import javax.sql.*;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Stack;
 
 public class AppHomeServer {
 
 	public static String decision;
-	public static Stack<ServerProtocol> listenerQueue = new Stack<ServerProtocol>();
+	public static LinkedList<ServerProtocol> listenerQueue = new LinkedList<ServerProtocol>();
 	private Connection dbConn;
 
 	public void startServer() {
@@ -54,10 +57,19 @@ public class AppHomeServer {
 		}
 	}
 
+	/**
+	 * Method called within the serverprotocol class where the server protocol adds itself to the list of waiting logins when it is 
+	 * created
+	 * @param rl - the waiting userlogin serverProtocol to be added to the list
+	 */
 	public void setId(ServerProtocol rl) {
 		listenerQueue.add(rl);
 	}
 
+	public Connection getDBConn(){
+		return dbConn;
+	}
+	
 }
 
 class doComms implements Runnable {
@@ -194,7 +206,7 @@ class doComms implements Runnable {
 			stmnt.executeUpdate();
 	}
 
-	private ResultSet checkRegDetails(String regid) {
+	public ResultSet checkRegDetails(String regid) {
 		try {
 			PreparedStatement regDetails = dbConn.prepareStatement("SELECT * "
 					+ "FROM userinfo " + "WHERE reg_id = ? ");
@@ -209,7 +221,7 @@ class doComms implements Runnable {
 		return null;
 	}
 	
-	private ResultSet checkUsernmDetails(String username) {
+	public ResultSet checkUsernmDetails(String username) {
 		try {
 			PreparedStatement regDetails = dbConn.prepareStatement("SELECT * "
 					+ "FROM userInfo " + "WHERE user_name = ? ");
@@ -225,18 +237,34 @@ class doComms implements Runnable {
 	}
 
 	private synchronized void fireResponseEvent(boolean b, String id) {
-		String ident = id;
-		Stack<ServerProtocol> temp = new Stack<ServerProtocol>();
-		ResponseEvent response = new ResponseEvent(this, ident, b);
-		ServerProtocol rl = AppHomeServer.listenerQueue.pop();
-		while (rl.getId().equalsIgnoreCase(id) == false) {
-			temp.push(rl);
+//		String ident = id;
+//		Stack<ServerProtocol> temp = new Stack<ServerProtocol>();
+//		ResponseEvent response = new ResponseEvent(this, id, b);
+//		ServerProtocol rl = AppHomeServer.listenerQueue.pop();		// ERROR HERE - STACK IS A BAAAAAAD IDEA
+//		while (rl.getId().equalsIgnoreCase(id) == false) {
+//			temp.push(rl);
+//		}
+//		rl.responseReceived(response);
+//		while (temp.empty() == false) {
+//			ServerProtocol next = temp.pop();
+//			AppHomeServer.listenerQueue.push(next);
+//		}
+
+		ResponseEvent response = new ResponseEvent(this, id, b);
+		ListIterator<ServerProtocol> it = AppHomeServer.listenerQueue.listIterator();
+		if (it.hasNext()) {
+			ServerProtocol tempProto = (ServerProtocol) it.next();
+			while (it.hasNext() && !tempProto.getId().equalsIgnoreCase(id)) {
+				tempProto = (ServerProtocol) it.next();
+			}
+			if (tempProto.getId().equalsIgnoreCase(id)) {
+				// fire response event
+				tempProto.responseReceived(response);
+				// remove element
+				it.remove();
+			}
 		}
-		rl.responseReceived(response);
-		while (temp.empty() == false) {
-			ServerProtocol next = temp.pop();
-			AppHomeServer.listenerQueue.push(next);
-		}
+
 	}
 
 	/**

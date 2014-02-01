@@ -18,7 +18,7 @@ public class GCMServer {
 
 	public String API_KEY = "AIzaSyDp8owY4eIcngiuG5NPH92tVn9mwOUsRVI";
 //	public String reg_id = "APA91bELztfJIQZF6HpjNrWS-0nG-pYo1xFx6IXq5Xe3O5FzdPcQnpf_JoFKb52BAexS-W6euYkaW_jsFlEcWkA07tejb6bfTIbV6YDOSnNs_3PulXTxAQJNABL39gielVC5HciVra-gWB8FDQr3Un9mayqq7Mzkce_flT26teQKRdHtncmu3sA";
-	public String reg_id = "APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4";
+	public String reg_id; // = "APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4";
 	public String header = "Authorization:key=AIzaSyDp8owY4eIcngiuG5NPH92tVn9mwOUsRVI";
 	public String GCMDestinationURL = "https://android.googleapis.com/gcm/send";
 
@@ -31,8 +31,10 @@ public class GCMServer {
 	 * Posts to the GCM server, currently only one device is hard coded in.
 	 * @return the body of the GCM Server's response.
 	 */
-	public String postToGCM() {
+	public String postToGCM(String reg_id) {
 
+		this.reg_id = reg_id;
+		
 		URL url;
 		HttpsURLConnection connection = null;
 		

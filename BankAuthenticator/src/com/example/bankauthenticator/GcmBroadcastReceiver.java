@@ -44,8 +44,8 @@ public class GcmBroadcastReceiver extends BroadcastReceiver{
         } else {
         	
         	String temp = intent.getExtras().toString();
-        	int leng = temp.length() - 183;
-        	regid = temp.substring(32, (32 + 183) );
+        	String[] locateRegid = temp.split("regid=");
+        	regid = locateRegid[1].substring(0, 183); //183 or 182?
         	
             new connectTask().execute("");
             

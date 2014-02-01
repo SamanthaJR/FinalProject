@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class AppClient {
 
 	private String serverMessage;
-	public static final String SERVERIP = "147.188.196.137";
+	public static final String SERVERIP = "147.188.195.146";  //"147.188.196.137" is downstairs IP;
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
 	private Socket socket;

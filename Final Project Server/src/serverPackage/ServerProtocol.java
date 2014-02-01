@@ -2,6 +2,9 @@ package serverPackage;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.sql.*;
+
+import javax.sql.*;
 
 
 public class ServerProtocol {
@@ -11,7 +14,7 @@ public class ServerProtocol {
 	public AppHomeServer ahs;
 	public ArrayList<ResponseEvent> responses = new ArrayList<ResponseEvent>();
 	private CountDownLatch block;
-	public String id = "APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4";
+	public String id; // = "APA91bFiyte1lCvhlfa5JnSeCCia-jYxDyhbYEilMjmS3Zvxe8pSzg7NDvUTJYefCKt1WGzdk1eyK8NQqW7wvbh6YjKe9V-k2UCvpgAvolJCyO1gNPpImmVQMfmHxUlcQyksbUEBSw3KHArfwfE2MmELjblDAGUIblrlDQ1Fzi0iD1Ig65U9GR4";
 	
 	public ServerProtocol(AppHomeServer ahs){
 		this.ahs = ahs;
@@ -26,21 +29,58 @@ public class ServerProtocol {
 	 * @return true if correct password/username combination. False if not.
 	 */
 	public boolean authenticate(String u, String p) {
-		if (u.contentEquals("SamanthaJR") && p.contentEquals("123")) {
-			ahs.setId(this);
-			gcm.postToGCM();
-			
-			try {
-				block.await();
-			} catch (InterruptedException e) {
-				System.out.println("Proto: ");
-				e.printStackTrace();
+		
+		
+		//check username and password match up correctly
+			// if not, not allowed in
+			//else get regid for username
+			//postToGCM with this regid
+		Connection dbConn = ahs.getDBConn();
+		
+		ResultSet usrnm = getUsernameAndPassFromDB(u, dbConn);
+		
+		try {
+			if(usrnm.next()){
+				id = usrnm.getString(1);
+				String user = usrnm.getString(2);
+				String pass = usrnm.getString(3);
+				if (u.contentEquals(user) && p.contentEquals(pass)) {
+					ahs.setId(this);
+					gcm.postToGCM(id);
+					
+					try {
+						block.await();
+					} catch (InterruptedException e) {
+						System.out.println("Proto: ");
+						e.printStackTrace();
+						return false;
+					}
+					
+				}
+				return decision;
+			} else {
 				return false;
 			}
-			
+		} catch (SQLException e) {
+			System.out.println("Proto: ");
+			e.printStackTrace();
+			return false;
 		}
-		
-		return decision;
+	}
+
+	private ResultSet getUsernameAndPassFromDB(String username, Connection dbConn) {
+		try {
+			PreparedStatement regDetails = dbConn.prepareStatement("SELECT * "
+					+ "FROM userInfo " + "WHERE user_name = ? ");
+			regDetails.setString(1, username);
+			ResultSet rs = regDetails.executeQuery();
+			return rs;
+
+		} catch (SQLException e) {
+			System.out.println("AHSThread: Problem creating or executing SQL Statement 2");
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
