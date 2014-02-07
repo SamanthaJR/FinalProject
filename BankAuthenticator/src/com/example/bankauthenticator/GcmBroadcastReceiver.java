@@ -69,7 +69,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 	}
 
 	/**
-	 * Method called after the GCM message receivecd which creates and posts a
+	 * Method called after the GCM message received which creates and posts a
 	 * notification.
 	 * 
 	 * @param msg
@@ -83,7 +83,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 				new Intent(context, MainActivity.class), 0);
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				context).setSmallIcon(R.drawable.ic_stat_notify_securelock)
+				context).setSmallIcon(R.drawable.ic_menu_securelock)
 				.setContentTitle("New Log In Attempt").setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
