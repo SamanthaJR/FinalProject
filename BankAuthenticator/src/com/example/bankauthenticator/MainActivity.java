@@ -1,5 +1,8 @@
 package com.example.bankauthenticator;
 
+/**
+ * Main Activity class for the app which is launched on app start.
+ */
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +39,6 @@ public class MainActivity extends Activity {
 	private static final String PROPERTY_APP_VERSION = "appVersion";
 	private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME = "onServerExpirationTimeMs";
 	public static final long REGISTRATION_EXPIRY_TIME_MS = 1000 * 3600 * 24 * 7;
-	public boolean connected = false;
 	public static String loginAccepted;
 	static final String TAG = "BankAuthenticator";
 	public static final int NOTIFICATION_ID = 1;
@@ -111,6 +113,10 @@ public class MainActivity extends Activity {
 		return regId;
 	}
 
+	/**
+	 * Registers to the GCM servers in an AsyncTask if the device is not already
+	 * registered.
+	 */
 	private void registerInBackground() {
 		new AsyncTask() {
 			@Override
@@ -125,17 +131,6 @@ public class MainActivity extends Activity {
 					}
 					regid = gcm.register(SENDER_ID);
 					msg = "Device registered, registration id=" + regid;
-
-					// You should send the registration ID to your server over
-					// HTTP,
-					// so it can use GCM/HTTP or CCS to send messages to your
-					// app.
-
-					// For this demo: we don't need to send it because the
-					// device
-					// will send upstream messages to a server that echo back
-					// the message
-					// using the 'from' address in the message.
 
 					// Save the regid - no need to register again.
 					setRegistrationId(context, regid);
@@ -237,10 +232,15 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	public void setConnected(boolean set) {
-		connected = set;
-	}
-
+	/**
+	 * Method called when the Submit button is clicked. Checks the values
+	 * entered in the text zones. If the password and confirm password fields
+	 * are not identical, it launches a warning toast and prompts re-entry.
+	 * Otherwise it prompts an AppClient object to connect to the AppHomeServer
+	 * with all the suitable details needed to register the device.
+	 * 
+	 * @param view
+	 */
 	public void submitClick(View view) {
 
 		usernm = mUsername.getText().toString();
@@ -263,6 +263,12 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Method launches a toast object.
+	 * 
+	 * @param toastMess
+	 *            - the message to be displayed in the toast.
+	 */
 	public void launchToast(String toastMess) {
 		Context context = getApplicationContext();
 		CharSequence text = toastMess;
@@ -271,12 +277,20 @@ public class MainActivity extends Activity {
 		toast.show();
 	}
 
+	/**
+	 * External class that is removed from the UI thread that instantiates a new
+	 * AppClient object and calls its run() method.
+	 * 
+	 * @author sjr090
+	 * 
+	 */
 	public class connectRegTask extends AsyncTask<String, String, AppClient> {
 
 		@Override
 		protected AppClient doInBackground(String... message) {
 
-			// we create a TCPClient object and pass to it all the data it needs.
+			// we create a TCPClient object and pass to it all the data it
+			// needs.
 			mAppClient = new AppClient(getApplicationContext(), false, regLen,
 					regid, usernm, pass);
 			mAppClient.run();

@@ -1,6 +1,12 @@
+/**
+ * Activity class that is started when the user attempts to login. It
+ * displays the login query and provides two buttons, accept or decline.
+ */
 package com.example.bankauthenticator;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
@@ -43,11 +49,11 @@ public class ButtonActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.button, menu);
 		return true;
 	}
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private void startMainAct() {
 		Intent myIntent = new Intent(this, MainActivity.class);
         myIntent.setClassName("com.example.bankauthenticator", "com.example.bankauthenticator.MainActivity");
