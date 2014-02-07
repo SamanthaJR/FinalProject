@@ -52,6 +52,10 @@
             android:name="com.example.bankauthenticator.ButtonActivity"
             android:label="@string/title_activity_button" >
         </activity>
+        <activity
+            android:name="com.example.bankauthenticator.SuccessActivity"
+            android:label="@string/title_activity_success" >
+        </activity>
     </application>
 
 </manifest>

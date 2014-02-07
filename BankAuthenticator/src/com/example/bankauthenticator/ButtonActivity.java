@@ -15,14 +15,14 @@ import android.widget.Button;
 
 public class ButtonActivity extends Activity {
 	
-	
+	public final static String USER_RESPONSE = "com.example.bankauthenticator.RESPONSE";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_button);
 		GcmBroadcastReceiver.loginAccepted = "wait";
-		
+
 		Button acc = (Button) findViewById(R.id.yes_button);
 		Button dec = (Button) findViewById(R.id.no_button);
 
@@ -31,7 +31,7 @@ public class ButtonActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				GcmBroadcastReceiver.mAppClient.sendMessage("Accepted");
-				startMainAct();
+				startSuccessAct("accept");
 			}
 
 		});
@@ -40,11 +40,11 @@ public class ButtonActivity extends Activity {
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				startMainAct();
+				startSuccessAct("decline");
 				GcmBroadcastReceiver.mAppClient.sendMessage("Declined");
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -53,12 +53,22 @@ public class ButtonActivity extends Activity {
 		return true;
 	}
 
+	/**
+	 * Method that starts a new activity to alert the user that they have
+	 * successfully input their response to the login.
+	 * 
+	 * @param response
+	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void startMainAct() {
-		Intent myIntent = new Intent(this, MainActivity.class);
-        myIntent.setClassName("com.example.bankauthenticator", "com.example.bankauthenticator.MainActivity");
-        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(myIntent);
+	private void startSuccessAct(String response) {
+		Intent myIntent = new Intent(this, SuccessActivity.class);
+		myIntent.setClassName("com.example.bankauthenticator",
+				"com.example.bankauthenticator.SuccessActivity");
+		myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		myIntent.putExtra(USER_RESPONSE, response);
+		startActivity(myIntent);
 	}
-	
+
 }
