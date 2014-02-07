@@ -194,35 +194,39 @@ containing a value of this type.
         public static final int market_securelock=0x7f020024;
     }
     public static final class id {
-        public static final int action_settings=0x7f05000e;
-        public static final int confirm_password=0x7f05000b;
-        public static final int display=0x7f050007;
+        public static final int action_settings=0x7f050010;
+        public static final int confirm_password=0x7f05000a;
+        public static final int display=0x7f05000c;
         public static final int hybrid=0x7f050004;
         public static final int no_button=0x7f050005;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
-        public static final int password=0x7f05000a;
+        public static final int password=0x7f050009;
+        public static final int reg_mess=0x7f050007;
+        public static final int register_button=0x7f05000e;
         public static final int satellite=0x7f050002;
-        public static final int submit_button=0x7f05000c;
-        public static final int success_text=0x7f05000d;
+        public static final int submit_button=0x7f05000b;
+        public static final int success_text=0x7f05000f;
         public static final int terrain=0x7f050003;
-        public static final int username=0x7f050009;
-        public static final int welc_mess=0x7f050008;
+        public static final int username=0x7f050008;
+        public static final int welc_mess=0x7f05000d;
         public static final int yes_button=0x7f050006;
     }
     public static final class layout {
         public static final int activity_button=0x7f030000;
-        public static final int activity_load=0x7f030001;
-        public static final int activity_main=0x7f030002;
-        public static final int activity_secure_lock=0x7f030003;
-        public static final int activity_success=0x7f030004;
+        public static final int activity_launch=0x7f030001;
+        public static final int activity_load=0x7f030002;
+        public static final int activity_main=0x7f030003;
+        public static final int activity_secure_lock=0x7f030004;
+        public static final int activity_success=0x7f030005;
     }
     public static final class menu {
         public static final int button=0x7f090000;
-        public static final int load=0x7f090001;
-        public static final int main=0x7f090002;
-        public static final int secure_lock=0x7f090003;
-        public static final int success=0x7f090004;
+        public static final int launch=0x7f090001;
+        public static final int load=0x7f090002;
+        public static final int main=0x7f090003;
+        public static final int secure_lock=0x7f090004;
+        public static final int success=0x7f090005;
     }
     public static final class string {
         public static final int accept_string=0x7f06001c;
@@ -323,8 +327,11 @@ containing a value of this type.
         public static final int decline_string=0x7f06001d;
         public static final int hello_world=0x7f06001b;
         public static final int password_hint=0x7f060022;
+        public static final int reg_message=0x7f060027;
+        public static final int register_button_string=0x7f060028;
         public static final int submit_button_string=0x7f060024;
         public static final int title_activity_button=0x7f06001e;
+        public static final int title_activity_launch=0x7f060026;
         public static final int title_activity_success=0x7f060025;
         public static final int username_hint=0x7f060021;
         public static final int welcome_message=0x7f060020;

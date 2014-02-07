@@ -14,5 +14,8 @@
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="submit_button_string">Submit</string>
     <string name="title_activity_success">SuccessActivity</string>
+    <string name="title_activity_launch">LaunchActivity</string>
+    <string name="reg_message">Please Register your Device</string>
+    <string name="register_button_string">Register</string>
 
 </resources>
