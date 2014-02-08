@@ -30,5 +30,16 @@ public class SuccessActivity extends Activity {
 		getMenuInflater().inflate(R.menu.success, menu);
 		return true;
 	}
+	
+	@Override
+	  public void onBackPressed(){
+		Intent myIntent = new Intent(this, MainActivity.class);
+		myIntent.setClassName("com.example.bankauthenticator",
+				"com.example.bankauthenticator.MainActivity");
+		myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(myIntent);
+	}
 
 }

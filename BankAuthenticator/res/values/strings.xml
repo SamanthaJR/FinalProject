@@ -6,15 +6,15 @@
     <string name="hello_world">Hello world!</string>
     <string name="accept_string">Allow</string>
     <string name="decline_string">Decline</string>
-    <string name="title_activity_button">ButtonActivity</string>
+    <string name="title_activity_button">Login Response</string>
     <string name="choose_button">Someone is attempting to login to you account? Do you wish to grant them access?</string>
     <string name="welcome_message">Welcome to the SecureLock App. Please register your device if necessary.</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="submit_button_string">Submit</string>
-    <string name="title_activity_success">SuccessActivity</string>
-    <string name="title_activity_launch">LaunchActivity</string>
+    <string name="title_activity_success">SecureLock</string>
+    <string name="title_activity_launch">Register</string>
     <string name="reg_message">Please Register your Device</string>
     <string name="register_button_string">Register</string>
 

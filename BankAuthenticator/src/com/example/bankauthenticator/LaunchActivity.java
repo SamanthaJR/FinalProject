@@ -1,11 +1,15 @@
 package com.example.bankauthenticator;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +23,7 @@ public class LaunchActivity extends Activity {
 	String usernm, pass, regid;
 	int regLen;
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,6 +37,8 @@ public class LaunchActivity extends Activity {
 		Intent intent = getIntent();
 		regid = intent.getStringExtra("USER_REGID");
 
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 		
 	}
 
@@ -40,6 +47,28 @@ public class LaunchActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.launch, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+	    case android.R.id.home:
+	        NavUtils.navigateUpFromSameTask(this);
+	        return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	  public void onBackPressed(){
+		Intent myIntent = new Intent(this, MainActivity.class);
+		myIntent.setClassName("com.example.bankauthenticator",
+				"com.example.bankauthenticator.MainActivity");
+		myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(myIntent);
 	}
 	
 	/**
