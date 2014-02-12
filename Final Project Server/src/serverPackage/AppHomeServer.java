@@ -13,6 +13,13 @@ import javax.sql.*;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Timer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class AppHomeServer {
 
@@ -47,9 +54,26 @@ public class AppHomeServer {
 				server = listener.accept();
 				System.out.println("AHS: AppClient accepted.");
 
-				doComms conn_c = new doComms(server, dbConn);
-				Thread t = new Thread(conn_c);
-				t.start();
+				ExecutorService executor = Executors.newSingleThreadExecutor();
+				doComms t = new doComms(server, dbConn);
+				Future<?> future = executor.submit(t);
+
+				try {
+					System.out.println("Started..");
+					System.out.println(future.get(1, TimeUnit.MINUTES));
+					System.out.println("Finished!");
+				} catch (TimeoutException e) {
+					System.out.println("Terminated!");
+					t.removeElement();
+					t.closeClientConnection();
+				} catch (InterruptedException e) {
+					System.out.println("Interrupted!");
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					System.out.println("Execution.");
+					e.printStackTrace();
+				}
+				executor.shutdownNow();
 			}
 
 		} catch (IOException ioe) {
@@ -92,6 +116,8 @@ class doComms implements Runnable {
 	private Socket server;
 	private char[] line, resp, task, regid, len, details;
 	private Connection dbConn;
+	private InputStreamReader is;
+	private PrintStream out;
 
 	public doComms(Socket server, Connection dbConn) {
 		this.server = server;
@@ -108,9 +134,8 @@ class doComms implements Runnable {
 
 		try {
 			// Setup input and output streams for the connection
-			InputStreamReader is = new InputStreamReader(
-					server.getInputStream());
-			PrintStream out = new PrintStream(server.getOutputStream());
+			is = new InputStreamReader(server.getInputStream());
+			out = new PrintStream(server.getOutputStream());
 
 			// Initiate Handshake
 			out.println("Hello Client");
@@ -192,20 +217,14 @@ class doComms implements Runnable {
 					AppHomeServer.decision = "false";
 					fireResponseEvent(false, id);
 					System.out.println("Declined login!");
+				} else {
+					removeElement();
+					// throw new
+					// UnexpectedClientMessageException("Task incorrect.");
 				}
-			} else
-				throw new UnexpectedClientMessageException("Task incorrect.");
+				closeClientConnection();
 
-			// Signal Client to close the connection.
-			out.println("Goodbye Client");
-
-			out.flush();
-			out.close();
-			is.close();
-			server.close();
-
-			System.out.println("Connection closed");
-
+			}
 		} catch (IOException ioe) {
 			System.out.println("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
@@ -214,7 +233,23 @@ class doComms implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void closeClientConnection() {
+		// Signal Client to close the connection.
+		out.println("Goodbye Client");
+
+		out.flush();
+		out.close();
+		try {
+			is.close();
+			server.close();
+		} catch (IOException e) {
+			System.out.println("Exception when closing connection");
+			e.printStackTrace();
+		}
+		System.out.println("Connection closed");
+	}
+
 	/**
 	 * Method assesses both parameter Strings are equal.
 	 * 
@@ -340,5 +375,29 @@ class doComms implements Runnable {
 			}
 		}
 
+	}
+
+	/**
+	 * Method removed a ServerProtocol from the list if it is still present
+	 * after a timeout.
+	 * 
+	 * @param rl
+	 *            - the ServerProtocol object to be removed.
+	 */
+	public void removeElement() {
+		ListIterator<ServerProtocol> it = AppHomeServer.listenerQueue
+				.listIterator();
+		if (it.hasNext()) {
+			ServerProtocol tempProto = (ServerProtocol) it.next();
+			while (it.hasNext()
+					&& !tempProto.getId().equalsIgnoreCase(
+							String.valueOf(regid))) {
+				tempProto = (ServerProtocol) it.next();
+			}
+			if (tempProto.getId().equalsIgnoreCase(String.valueOf(regid))) {
+				// remove element
+				it.remove();
+			}
+		}
 	}
 }
