@@ -12,18 +12,25 @@ import android.widget.Toast;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.util.Enumeration;
+
+import javax.net.ssl.*;
+
 
 public class AppClient {
 
 	private String serverMessage;
-	public static final String SERVERIP = "147.188.196.138"; // is -12038 IP
-	// public static final String SERVERIP = "147.188.196.137"; // is downstairs
+//	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
+	public static final String SERVERIP = "147.188.195.196"; // is downstairs
 	// IP
 	// public static final String SERVERIP = "147.188.195.146"; //is upstairs IP
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
-	private Socket socket;
+	private SSLSocket socket;
 	public Context cntx;
 	boolean authenticating;
 	public String regid, username, password;
@@ -56,19 +63,6 @@ public class AppClient {
 	}
 
 	/**
-	 * Sends an integer value to the server.
-	 * 
-	 * @param message
-	 *            - int to be sent.
-	 */
-	public void sendIntMessage(int message) {
-		if (out != null && !out.checkError()) {
-			out.print(message);
-			out.flush();
-		}
-	}
-
-	/**
 	 * Closes the streams and then the socket and sets the mRun variable to
 	 * false, which alerts the rest of the class to stop listening for server
 	 * messages.
@@ -84,6 +78,29 @@ public class AppClient {
 			e.printStackTrace();
 		}
 	}
+	
+
+
+private InetAddress getLocalAddress()throws IOException {
+
+            try {
+                for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                    NetworkInterface intf = en.nextElement();
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()) {
+                            //return inetAddress.getHostAddress().toString();
+                            return inetAddress;
+                        }
+                    }
+                }
+            } catch (SocketException ex) {
+                Log.e("SALMAN", ex.toString());
+            }
+            return null;
+        }
+
+
 
 	/**
 	 * Method called when the AppClient is created to start it running
@@ -95,12 +112,34 @@ public class AppClient {
 		try {
 			// here you must put your computer's IP address.
 			InetAddress serverAddr = InetAddress.getByName(SERVERIP);
+			InetAddress localAddr = getLocalAddress();
 
 			Log.e("TCP Client", "C: Connecting...");
-
-			// create a socket, wrap input and output to PrintWriter and
-			// BufferedReader.
-			socket = new Socket(serverAddr, SERVERPORT);
+			
+			
+			// Load the self-signed server certificate
+			char[] passphrase = "SecureLock".toCharArray();
+			KeyStore ksTrust = KeyStore.getInstance("BKS");
+			ksTrust.load(cntx.getResources().openRawResource(R.raw.clientstore),
+			             passphrase);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			tmf.init(ksTrust);
+			
+			
+			
+			// Create a SSLContext with the certificate
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
+			
+			
+			
+//			Create a secure socket, wrap input and output to PrintWriter and BufferedReader.
+			SSLSocketFactory factory = sslContext.getSocketFactory();
+			SSLSocket socket = (SSLSocket) factory.createSocket(serverAddr, SERVERPORT);
+			
+//			Socket socket = new Socket(serverAddr, SERVERPORT);
+			
+			Log.d("AppClient", "created socket");
 
 			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
 					socket.getOutputStream())), true);
@@ -125,7 +164,7 @@ public class AppClient {
 					} else {
 						sendMessage("registering");
 						Log.d("AC: ", Integer.toString(length));
-						sendIntMessage(length);
+						sendMessage(Integer.toString(length));
 						sendMessage(regid + '^' + username + '^' + password);
 					}
 

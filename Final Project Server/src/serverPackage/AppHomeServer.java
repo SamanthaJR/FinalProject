@@ -9,6 +9,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 import javax.sql.*;
 
 import java.util.LinkedList;
@@ -46,12 +49,22 @@ public class AppHomeServer {
 		}
 
 		try {
-			// Setup a TCP socket.
-			ServerSocket listener = new ServerSocket(4444);
+			//setup properties to allow SSLSocket
+//			System.setProperty("javax.net.ssl.keyStore", "/home/students/sjr090/work/SSC2/DBex2/Final\\ Project\\ Server//ApHSstore.jks");
+//			System.setProperty("javax.net.ssl.keyStorePassword","SecureLock");
+//			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/work/SSC2/DBex2/Final\\ Project\\ Server//ApHSstore.jks");
+//			System.setProperty("javax.net.ssl.trustStorePassword","SecureLock");
+			// Setup a secure TCP socket.
+			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+			SSLServerSocket listener = (SSLServerSocket) factory.createServerSocket(4444);
 			System.out.println("AHS: Started, Listening to port 4444");
-			Socket server;
+			SSLSocket server;
+			
+//			ServerSocket listener = new ServerSocket(4444);
+//			Socket server = new Socket();
+			
 			while (true) {
-				server = listener.accept();
+				server = (SSLSocket) listener.accept();
 				System.out.println("AHS: AppClient accepted.");
 
 				ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -146,10 +159,11 @@ class doComms implements Runnable {
 			is.read(line, 0, 12);
 			if (checkMessage(line, "Hello Server")) {
 				System.out.println("Message received:" + String.valueOf(line));
-			} else
+			} else {
+				System.out.println("Message received:" + String.valueOf(line));
 				throw new UnexpectedClientMessageException(
 						"Handshake incorrect.");
-
+			}
 			// Read if registering or logging in
 			is.read(task, 0, 11);
 
@@ -234,6 +248,10 @@ class doComms implements Runnable {
 		}
 	}
 
+	/**
+	 * Method called to terminate the connection with the Client once the
+	 * communication has been completed.
+	 */
 	public void closeClientConnection() {
 		// Signal Client to close the connection.
 		out.println("Goodbye Client");

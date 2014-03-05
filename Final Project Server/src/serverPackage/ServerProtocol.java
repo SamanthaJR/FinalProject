@@ -58,6 +58,7 @@ public class ServerProtocol {
 				String pass = usrnm.getString(3);
 				if (u.contentEquals(user) && p.contentEquals(pass)) {
 					ahs.setId(this);
+					System.out.println("SP: Posting to GCMS");
 					gcm.postToGCM(id);
 
 					try {

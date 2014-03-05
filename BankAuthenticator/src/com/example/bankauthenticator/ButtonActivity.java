@@ -4,19 +4,25 @@
  */
 package com.example.bankauthenticator;
 
+import java.util.concurrent.Executor;
+
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class ButtonActivity extends Activity {
 	
 	public final static String USER_RESPONSE = "com.example.bankauthenticator.RESPONSE";
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,7 +36,8 @@ public class ButtonActivity extends Activity {
 		acc.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				GcmBroadcastReceiver.mAppClient.sendMessage("Accepted");
+				SendTask st = new SendTask();
+				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Accepted");
 				startSuccessAct("accept");
 			}
 
@@ -40,8 +47,9 @@ public class ButtonActivity extends Activity {
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				startSuccessAct("decline");
-				GcmBroadcastReceiver.mAppClient.sendMessage("Declined");
+				SendTask st = new SendTask();
+				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Declined");
+				startSuccessAct("decline");	
 			}
 		});
 
@@ -70,5 +78,19 @@ public class ButtonActivity extends Activity {
 		myIntent.putExtra(USER_RESPONSE, response);
 		startActivity(myIntent);
 	}
+	
+	private class SendTask extends AsyncTask<String, Void, Void> {
+		CharSequence text;
 
+		@Override
+		protected Void doInBackground(String... params) {
+			Log.d("BAsync", "Executing message send");
+			GcmBroadcastReceiver.mAppClient.sendMessage(params[0]);
+			return null;
+		}
+
+	}
+
+	
+	
 }
