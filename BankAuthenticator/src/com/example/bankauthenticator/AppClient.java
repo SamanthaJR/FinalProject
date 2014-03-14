@@ -6,6 +6,7 @@
 package com.example.bankauthenticator;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,33 +21,37 @@ import java.util.Enumeration;
 
 import javax.net.ssl.*;
 
-
 public class AppClient {
 
 	private String serverMessage;
-//	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
-	public static final String SERVERIP = "147.188.195.196"; // is downstairs
+	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
+//	public static final String SERVERIP = "147.188.195.196"; // is downstairs
 	// IP
 	// public static final String SERVERIP = "147.188.195.146"; //is upstairs IP
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
 	private SSLSocket socket;
 	public Context cntx;
-	boolean authenticating;
-	public String regid, username, password;
+	public String regid, username, password, locRadius, locName, what,
+			location, transType;
 	int length;
 
 	private PrintWriter out;
 	private BufferedReader in;
 
-	public AppClient(Context cntx, boolean authenticating, int length,
-			String regid, String username, String password) {
+	public AppClient(Context cntx, String what, int length, String regid,
+			String username, String password, String locRadius, String locName,
+			String location, String transType) {
 		this.cntx = cntx;
-		this.authenticating = authenticating;
+		this.what = what;
 		this.regid = regid;
 		this.length = length;
 		this.username = username;
 		this.password = password;
+		this.locName = locName;
+		this.locRadius = locRadius;
+		this.location = location;
+		this.transType = transType;
 	}
 
 	/**
@@ -70,37 +75,39 @@ public class AppClient {
 	public void stopClient() {
 		mRun = false;
 		try {
+			if(out != null);
 			out.close();
+			if(in != null);
 			in.close();
-			socket.close();
+			if (socket != null) {
+				socket.close();
+			}
 		} catch (IOException e) {
 			System.out.println("AHS: Error closing socket");
 			e.printStackTrace();
 		}
 	}
-	
 
+	private InetAddress getLocalAddress() throws IOException {
 
-private InetAddress getLocalAddress()throws IOException {
-
-            try {
-                for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                    NetworkInterface intf = en.nextElement();
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        if (!inetAddress.isLoopbackAddress()) {
-                            //return inetAddress.getHostAddress().toString();
-                            return inetAddress;
-                        }
-                    }
-                }
-            } catch (SocketException ex) {
-                Log.e("SALMAN", ex.toString());
-            }
-            return null;
-        }
-
-
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface
+					.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf
+						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						// return inetAddress.getHostAddress().toString();
+						return inetAddress;
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e("AC: ", ex.toString());
+		}
+		return null;
+	}
 
 	/**
 	 * Method called when the AppClient is created to start it running
@@ -115,30 +122,29 @@ private InetAddress getLocalAddress()throws IOException {
 			InetAddress localAddr = getLocalAddress();
 
 			Log.e("TCP Client", "C: Connecting...");
-			
-			
+
 			// Load the self-signed server certificate
 			char[] passphrase = "SecureLock".toCharArray();
 			KeyStore ksTrust = KeyStore.getInstance("BKS");
-			ksTrust.load(cntx.getResources().openRawResource(R.raw.clientstore),
-			             passphrase);
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			ksTrust.load(
+					cntx.getResources().openRawResource(R.raw.clientstore),
+					passphrase);
+			TrustManagerFactory tmf = TrustManagerFactory
+					.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 			tmf.init(ksTrust);
-			
-			
-			
+
 			// Create a SSLContext with the certificate
 			SSLContext sslContext = SSLContext.getInstance("TLS");
 			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
-			
-			
-			
-//			Create a secure socket, wrap input and output to PrintWriter and BufferedReader.
+
+			// Create a secure socket, wrap input and output to PrintWriter and
+			// BufferedReader.
 			SSLSocketFactory factory = sslContext.getSocketFactory();
-			SSLSocket socket = (SSLSocket) factory.createSocket(serverAddr, SERVERPORT);
-			
-//			Socket socket = new Socket(serverAddr, SERVERPORT);
-			
+			SSLSocket socket = (SSLSocket) factory.createSocket(serverAddr,
+					SERVERPORT);
+
+			// Socket socket = new Socket(serverAddr, SERVERPORT);
+
 			Log.d("AppClient", "created socket");
 
 			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
@@ -158,14 +164,28 @@ private InetAddress getLocalAddress()throws IOException {
 				if (serverMessage.equals("Hello Client")) {
 					sendMessage("Hello Server");
 
-					if (authenticating) {
+					if (what.equalsIgnoreCase("authenticating")) {
 						sendMessage("user log in");
 						sendMessage(regid);
-					} else {
+					} else if (what.equalsIgnoreCase("registering")) {
 						sendMessage("registering");
 						Log.d("AC: ", Integer.toString(length));
 						sendMessage(Integer.toString(length));
 						sendMessage(regid + '^' + username + '^' + password);
+					} else if(what.equalsIgnoreCase("locationing")) {
+						sendMessage(what);
+						sendMessage(regid);
+						sendLengthAndMessage(locName);
+						sendMessage(transType);
+					} else if(what.equalsIgnoreCase("addLocation")){
+						sendMessage("addLocation");
+						Log.d("AC: ", "Sending new Location");
+						sendMessage(regid);
+						sendLengthAndMessage(username);
+						sendLengthAndMessage(password);
+						sendLengthAndMessage(locName);
+						sendLengthAndMessage(locRadius);
+						sendLengthAndMessage(location);
 					}
 
 				} else if (serverMessage.equals("Goodbye Client")) {
@@ -173,17 +193,44 @@ private InetAddress getLocalAddress()throws IOException {
 					stopClient();
 				} else if (serverMessage.equals("Already Registered Client")) {
 					Log.d("AC: ", serverMessage);
-					new showToast().execute("Aready Registered");
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Aready Registered");
 					stopClient();
 				} else if (serverMessage.equals("Username Taken Client")) {
 					Log.d("AC: ", serverMessage);
-					new showToast().execute("Username Taken");
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Username Taken");
 					stopClient();
 				} else if (serverMessage
 						.equals("Succesful Registration Client")) {
 					Log.d("AC: ", serverMessage);
-					new showToast().execute("Successfully Registered");
-				}
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Successfully Registered");
+				} else if (serverMessage
+						.equals("Location successfully added Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "New Location Added");
+					// TODO Tell LocationActivity to add geofences.
+					Location loc = new Location(location);
+					//Start new successfully added geofences 
+				} else if (serverMessage
+						.equals("Location already taken Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Location already present");
+				} else if (serverMessage
+						.equals("Radius updated Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Location Radius updated");
+				} else if (serverMessage
+						.equals("Login details incorrect Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Login details incorrect, please try again!");
+				} else if (serverMessage
+						.equals("Location name taken Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "This Location name is already being used for a different location, please choose another and try again.");
+				} else if (serverMessage
+						.equals("Device not Registered Client")) {
+					Log.d("AC: ", serverMessage);
+					new showToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Please register this device before adding locations.");
+				} 
 			}
 
 			// Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
@@ -194,6 +241,24 @@ private InetAddress getLocalAddress()throws IOException {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Method sends the length of a message to the server before sending the message itself.
+	 * @param mess - the message to be sent.
+	 */
+	private void sendLengthAndMessage(String mess) {
+		int uLen = mess.length();
+		if (uLen < 10) {
+			sendMessage("000" + Integer.toString(uLen));
+		} else if (uLen >= 10 && uLen < 100) {
+			sendMessage("00" + Integer.toString(uLen));
+		} else if (uLen >= 100 && uLen < 1000){
+			sendMessage("0" + Integer.toString(uLen));
+		} else {
+			sendMessage(Integer.toString(uLen));
+		}
+		sendMessage(mess);
 	}
 
 	/**
@@ -208,6 +273,7 @@ private InetAddress getLocalAddress()throws IOException {
 
 		@Override
 		protected CharSequence doInBackground(String... params) {
+			text = params[0];
 			if (params[0].equalsIgnoreCase("Aready Registered")) {
 				text = "This device has already been registered.";
 			} else if (params[0].equalsIgnoreCase("Username Taken")) {

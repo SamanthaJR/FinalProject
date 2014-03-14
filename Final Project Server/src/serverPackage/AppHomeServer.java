@@ -49,20 +49,17 @@ public class AppHomeServer {
 		}
 
 		try {
-			//setup properties to allow SSLSocket
-//			System.setProperty("javax.net.ssl.keyStore", "/home/students/sjr090/work/SSC2/DBex2/Final\\ Project\\ Server//ApHSstore.jks");
-//			System.setProperty("javax.net.ssl.keyStorePassword","SecureLock");
-//			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/work/SSC2/DBex2/Final\\ Project\\ Server//ApHSstore.jks");
-//			System.setProperty("javax.net.ssl.trustStorePassword","SecureLock");
 			// Setup a secure TCP socket.
-			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			SSLServerSocket listener = (SSLServerSocket) factory.createServerSocket(4444);
+			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory
+					.getDefault();
+			SSLServerSocket listener = (SSLServerSocket) factory
+					.createServerSocket(4444);
 			System.out.println("AHS: Started, Listening to port 4444");
 			SSLSocket server;
-			
-//			ServerSocket listener = new ServerSocket(4444);
-//			Socket server = new Socket();
-			
+
+			// ServerSocket listener = new ServerSocket(4444);
+			// Socket server = new Socket();
+
 			while (true) {
 				server = (SSLSocket) listener.accept();
 				System.out.println("AHS: AppClient accepted.");
@@ -127,7 +124,7 @@ public class AppHomeServer {
  */
 class doComms implements Runnable {
 	private Socket server;
-	private char[] line, resp, task, regid, len, details;
+	private char[] line, resp, task, regid, len, details, locInfo, radLen;
 	private Connection dbConn;
 	private InputStreamReader is;
 	private PrintStream out;
@@ -144,6 +141,8 @@ class doComms implements Runnable {
 		regid = new char[183];
 		task = new char[11];
 		len = new char[3];
+		radLen = new char[4];
+		locInfo = new char[1000];
 
 		try {
 			// Setup input and output streams for the connection
@@ -208,6 +207,7 @@ class doComms implements Runnable {
 						e.printStackTrace();
 					}
 				}
+				closeClientConnection();
 
 				// If required to authenticate:
 			} else if (checkMessage(task, "user log in")) {
@@ -238,6 +238,75 @@ class doComms implements Runnable {
 				}
 				closeClientConnection();
 
+			} else if (checkMessage(task, "addLocation")) {
+				// Add a new location to the database
+				is.read(regid, 0, 183);
+
+				String username = readLocVal();
+
+				String password = readLocVal();
+
+				String locName = readLocVal();
+
+				String locRad = readLocVal();
+
+				String location = readLocVal();
+
+				ResultSet regidSet = checkRegDetails(String.valueOf(regid));
+
+				if (regidSet != null) {
+					try {
+						if (!regidSet.next()) {
+							out.println("Device not Registered Client");
+							System.out.println("Device not Registered Client");
+						} else {
+							ResultSet userSet = checkUsernmDetails(username);
+							// if username already taken, statement is true
+							if (!userSet.next()) {
+								out.println("Login Details Incorrect Client");
+								System.out.println("Username Taken Client");
+							} else {
+								boolean check = passUserMatch(username,
+										password);
+								if (!check) {
+									out.println("Login details incorrect Client");
+									System.out
+											.println("Adding location, Password and Username do not match.");
+								} else {
+									if (locNameTaken(locName,
+											String.valueOf(regid))) {
+										out.println("Location name taken Client");
+										System.out
+												.println("Location name taken.");
+									} else {
+										addLocation(String.valueOf(regid),
+												username, password, locName,
+												locRad, location);
+										out.println("Location successfully added Client");
+										System.out
+												.println("Location successfully added Client");
+									}
+								}
+							}
+						}
+					} catch (SQLException e) {
+						System.out
+								.println("AHS: SQL Exception when adding location");
+						e.printStackTrace();
+					}
+				}
+				closeClientConnection();
+			} else if (checkMessage(task, "locationing")) {
+				System.out.println("locationing");
+				is.read(regid, 0, 183);
+				String reg_id = String.valueOf(regid);
+				String locName = readLocVal();
+				is.read(resp, 0, 8);
+				String transType = String.valueOf(resp);
+				System.out.println(transType);
+				updateGeofenceTransition(reg_id, locName, transType);
+				System.out.println("AHS: Geofence location updated");
+				closeClientConnection();
 			}
 		} catch (IOException ioe) {
 			System.out.println("IOException on socket listen: " + ioe);
@@ -245,6 +314,131 @@ class doComms implements Runnable {
 		} catch (UnexpectedClientMessageException e) {
 			System.out.println("Unexpected Client response");
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method called when the server is alerted by the device that the user has
+	 * entered or exited a Geofence, it updates the database
+	 * 
+	 * @param reg_id
+	 *            - the registration id of the device that has made the
+	 *            transition
+	 * @param locName
+	 *            - the name/id of the geofence that they have entered/exited.
+	 * @param transType
+	 *            - the transition: whether it is an entry or an exit.
+	 */
+	private void updateGeofenceTransition(String reg_id, String locName,
+			String transType) {
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("UPDATE locations "
+							+ "SET in_geofence = ? "
+							+ "WHERE reg_id = ? AND location_name = ?");
+			stmnt.setString(2, reg_id);
+			stmnt.setString(3, locName);
+			if (transType.equalsIgnoreCase("enter in")) {
+				stmnt.setBoolean(1, true);
+			} else {
+				stmnt.setBoolean(1, false);
+			}
+//			System.out.println(stmnt.toString());
+			stmnt.executeUpdate();
+		} catch (SQLException e) {
+			System.out
+					.println("AHS: " + "Problem updating geofence entry/exit");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method reads values from the Client and stores them in a String
+	 * 
+	 * @return - the String value read from the Client.
+	 */
+	private String readLocVal() {
+		try {
+			is.read(radLen, 0, 4);
+			int uLen = Integer.parseInt(String.valueOf(radLen));
+			// System.out.println("uLen is: " + String.valueOf(uLen));
+			is.read(locInfo, 0, uLen);
+			System.out.println(String.valueOf(locInfo));
+			String info = "";
+			for (int i = 0; i < uLen; i++) {
+				info += locInfo[i];
+			}
+			locInfo = new char[1000];
+			return info;
+		} catch (IOException e) {
+			System.out.println("Problem reading loc val");
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	/**
+	 * Adds new location information into the locations table in the database
+	 * 
+	 * @param valueOf
+	 *            - the user's device's unique registration ID
+	 * @param username
+	 * @param password
+	 * @param locName
+	 *            - the name that the user has decided to call this new
+	 *            location
+	 * @param locRad
+	 *            - the radius to set the size of the location
+	 * @param location
+	 *            - the toString() representation of a Location object that
+	 *            represents the latitude and longitude at the centre of the
+	 *            inputted area.
+	 */
+	private void addLocation(String valueOf, String username, String password,
+			String locName, String locRad, String location) {
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("INSERT INTO locations "
+							+ "(reg_id, username, password, location, radius, in_geofence, location_name) "
+							+ "VALUES (?, ?, ?, ?, ?, true, ?)");
+			stmnt.setString(1, valueOf);
+			stmnt.setString(2, username);
+			stmnt.setString(3, password);
+			stmnt.setString(4, location);
+			stmnt.setInt(5, Integer.parseInt(locRad));
+			stmnt.setString(6, locName);
+			stmnt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Problem inserting new location");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Method tests whether to correct combination of username and password have
+	 * been entered.
+	 * 
+	 * @param user
+	 *            - the username
+	 * @param pass
+	 *            - the password
+	 * @return - true if the password goes with the associated username, false
+	 *         if they do not match or if the username doesn't exist.
+	 */
+	private boolean passUserMatch(String user, String pass) {
+		try {
+			PreparedStatement passDetails = dbConn.prepareStatement("SELECT * "
+					+ "FROM userinfo "
+					+ "WHERE password = ?  AND user_name = ?");
+			passDetails.setString(1, pass);
+			passDetails.setString(2, user);
+			ResultSet rs = passDetails.executeQuery();
+			return rs.next();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -305,6 +499,36 @@ class doComms implements Runnable {
 		stmnt.setString(2, username);
 		stmnt.setString(3, password);
 		stmnt.executeUpdate();
+	}
+
+	/**
+	 * Method checks the locations table in the database to see if the location
+	 * name that the user has provided from a new location is present or not
+	 * 
+	 * @param locationName
+	 *            - the name the user is attempting to create
+	 * @param reg_id
+	 *            - the unique registration id of the user's device
+	 * @return - true if the name is already present in the database (only for
+	 *         this user), false otherwise.
+	 */
+	public boolean locNameTaken(String locationName, String reg_id) {
+		PreparedStatement locNameDetails;
+		try {
+			locNameDetails = dbConn.prepareStatement("SELECT * "
+					+ "FROM locations "
+					+ "WHERE reg_id = ?  AND location_name = ?");
+			locNameDetails.setString(1, reg_id);
+			locNameDetails.setString(2, locationName);
+			ResultSet rs = locNameDetails.executeQuery();
+			boolean b = rs.next();
+			System.out.println(b);
+			return (b);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return true;
+		}
 	}
 
 	/**

@@ -17,5 +17,17 @@
     <string name="title_activity_launch">Register</string>
     <string name="reg_message">Please Register your Device</string>
     <string name="register_button_string">Register</string>
+    <string name="location_button_string">Add Safe Location</string>
+    <string name="title_activity_location">Add Current Location</string>
+    <string name="location_intro">Enter the details to add current location to list of safe locations for login without your Smartphone.</string>
+    <string name="location_name_explanation">Please try and come up with a name no one else will be able to guess. Titles such as \'Home\' are not advised.</string>
+    <string name="location_name_hint">Location Name</string>
+    <string name="radius_explanation">Define the length of the radius, in metres, to encompass the area which this location represents.</string>
+    <string name="radius_hint">Radius</string>
+    <string name="rtis">Receive Transitions Intent Service</string>
+    <string name="title_activity_geo_setter">GeoSetterActivity</string>
+    <string name="awaiting_geo_conf">Adding Location Data</string>
+    <string name="success_add_geofence">Location successfully added</string>
+    <string name="fail_add_geofence">Error adding location, please try again</string>
 
 </resources>

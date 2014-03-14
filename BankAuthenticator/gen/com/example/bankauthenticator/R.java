@@ -194,39 +194,53 @@ containing a value of this type.
         public static final int market_securelock=0x7f020024;
     }
     public static final class id {
-        public static final int action_settings=0x7f060010;
-        public static final int confirm_password=0x7f06000a;
-        public static final int display=0x7f06000c;
+        public static final int action_settings=0x7f06001a;
+        public static final int confirm_password=0x7f06000b;
+        public static final int display=0x7f060015;
+        public static final int geofence_result=0x7f060007;
         public static final int hybrid=0x7f060004;
+        public static final int location_button=0x7f060018;
+        public static final int location_intro_field=0x7f06000d;
+        public static final int location_name=0x7f060011;
+        public static final int location_name_warning=0x7f060010;
+        public static final int location_password=0x7f06000f;
+        public static final int location_radius=0x7f060013;
+        public static final int location_radius_explanation=0x7f060012;
+        public static final int location_submit_button=0x7f060014;
+        public static final int location_username=0x7f06000e;
         public static final int no_button=0x7f060005;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int password=0x7f060009;
-        public static final int reg_mess=0x7f060007;
-        public static final int register_button=0x7f06000e;
+        public static final int password=0x7f06000a;
+        public static final int reg_mess=0x7f060008;
+        public static final int register_button=0x7f060017;
         public static final int satellite=0x7f060002;
-        public static final int submit_button=0x7f06000b;
-        public static final int success_text=0x7f06000f;
+        public static final int submit_button=0x7f06000c;
+        public static final int success_text=0x7f060019;
         public static final int terrain=0x7f060003;
-        public static final int username=0x7f060008;
-        public static final int welc_mess=0x7f06000d;
+        public static final int username=0x7f060009;
+        public static final int welc_mess=0x7f060016;
         public static final int yes_button=0x7f060006;
     }
     public static final class layout {
         public static final int activity_button=0x7f030000;
-        public static final int activity_launch=0x7f030001;
-        public static final int activity_load=0x7f030002;
-        public static final int activity_main=0x7f030003;
-        public static final int activity_secure_lock=0x7f030004;
-        public static final int activity_success=0x7f030005;
+        public static final int activity_geo_setter=0x7f030001;
+        public static final int activity_launch=0x7f030002;
+        public static final int activity_load=0x7f030003;
+        public static final int activity_location=0x7f030004;
+        public static final int activity_main=0x7f030005;
+        public static final int activity_secure_lock=0x7f030006;
+        public static final int activity_success=0x7f030007;
     }
     public static final class menu {
         public static final int button=0x7f0a0000;
-        public static final int launch=0x7f0a0001;
-        public static final int load=0x7f0a0002;
-        public static final int main=0x7f0a0003;
-        public static final int secure_lock=0x7f0a0004;
-        public static final int success=0x7f0a0005;
+        public static final int geo_setter=0x7f0a0001;
+        public static final int launch=0x7f0a0002;
+        public static final int load=0x7f0a0003;
+        public static final int location=0x7f0a0004;
+        public static final int main=0x7f0a0005;
+        public static final int secure_lock=0x7f0a0006;
+        public static final int success=0x7f0a0007;
     }
     public static final class raw {
         public static final int clientstore=0x7f040000;
@@ -258,6 +272,7 @@ containing a value of this type.
         [CHAR LIMIT=70] 
          */
         public static final int auth_client_using_bad_version_title=0x7f070013;
+        public static final int awaiting_geo_conf=0x7f070032;
         public static final int choose_button=0x7f07001f;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
@@ -328,13 +343,24 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f070012;
         public static final int confirm_password_hint=0x7f070023;
         public static final int decline_string=0x7f07001d;
+        public static final int fail_add_geofence=0x7f070034;
         public static final int hello_world=0x7f07001b;
+        public static final int location_button_string=0x7f070029;
+        public static final int location_intro=0x7f07002b;
+        public static final int location_name_explanation=0x7f07002c;
+        public static final int location_name_hint=0x7f07002d;
         public static final int password_hint=0x7f070022;
+        public static final int radius_explanation=0x7f07002e;
+        public static final int radius_hint=0x7f07002f;
         public static final int reg_message=0x7f070027;
         public static final int register_button_string=0x7f070028;
+        public static final int rtis=0x7f070030;
         public static final int submit_button_string=0x7f070024;
+        public static final int success_add_geofence=0x7f070033;
         public static final int title_activity_button=0x7f07001e;
+        public static final int title_activity_geo_setter=0x7f070031;
         public static final int title_activity_launch=0x7f070026;
+        public static final int title_activity_location=0x7f07002a;
         public static final int title_activity_success=0x7f070025;
         public static final int username_hint=0x7f070021;
         public static final int welcome_message=0x7f070020;

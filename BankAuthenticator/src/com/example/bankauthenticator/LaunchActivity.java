@@ -86,19 +86,24 @@ public class LaunchActivity extends Activity {
 		pass = mPassword.getText().toString();
 		String cPass = mConfPass.getText().toString();
 
-		if (!pass.equals(cPass)) {
-
-			launchToast("Make sure you have typed your password correctly!");
-
-			mPassword.setText("");
-			mConfPass.setText("");
+		if (usernm.length() == 0 || pass.length() == 0 || cPass.length() == 0) {
+			launchToast("Please ensure all fields are filled out.");
 		} else {
-			// calc lengths of vals from text zones
-			int usernmLen = usernm.length();
-			int passLen = pass.length();
-			regLen = 183 + usernmLen + passLen + 2;
 
-			new connectRegTask().execute("");
+			if (!pass.equals(cPass)) {
+
+				launchToast("Make sure you have typed your password correctly!");
+
+				mPassword.setText("");
+				mConfPass.setText("");
+			} else {
+				// calc lengths of vals from text zones
+				int usernmLen = usernm.length();
+				int passLen = pass.length();
+				regLen = 183 + usernmLen + passLen + 2;
+
+				new connectRegTask().execute("");
+			}
 		}
 	}
 
@@ -130,8 +135,8 @@ public class LaunchActivity extends Activity {
 
 			// we create a TCPClient object and pass to it all the data it
 			// needs.
-			mAppClient = new AppClient(getApplicationContext(), false, regLen,
-					regid, usernm, pass);
+			mAppClient = new AppClient(getApplicationContext(), "registering", regLen,
+					regid, usernm, pass, "", "", "", "");
 			mAppClient.run();
 
 			return null;

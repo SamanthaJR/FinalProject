@@ -102,7 +102,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
 		@Override
 		protected AppClient doInBackground(String... message) {
-			mAppClient = new AppClient(context, true, 0, regid, "", "");
+			mAppClient = new AppClient(context, "authenticating", 0, regid, "", "", "", "", "", "");
 			mAppClient.run();
 
 			return null;

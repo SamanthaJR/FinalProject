@@ -234,4 +234,15 @@ public class MainActivity extends Activity {
 		startActivity(myIntent);
 	}
 	
+	public void locationClick(View view){
+		Intent myIntent = new Intent(this, LocationActivity.class);
+		myIntent.setClassName("com.example.bankauthenticator",
+				"com.example.bankauthenticator.LocationActivity");
+		myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		myIntent.putExtra("USER_REGID", regid);
+		startActivity(myIntent);
+	}
+	
 }

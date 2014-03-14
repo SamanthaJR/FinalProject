@@ -32,5 +32,16 @@
         android:onClick="registerClick"
         android:visibility="visible" />
      
+      <Button
+        android:id="@+id/location_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center_vertical"
+        android:layout_alignParentRight="true"
+        android:text="@string/location_button_string"
+        android:onClick="locationClick"
+        android:visibility="visible" />
+     
      
 </RelativeLayout>
