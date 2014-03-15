@@ -23,18 +23,37 @@ public class WebServer {
 
 		// First Spark get method returns a simple webpage with two text entry
 		// boxes: one for username and one for password.
-		get(new Route("/hello") {
+		get(new Route("/login") {
 			@Override
 			public Object handle(Request request, Response response) {
 
 				response.type("text/html");
 
 				return ""
+						+"<head>"
+						+ "<script>"
+						+ "function codename() {"
+						+ "if(document.getElementById(\'locationcheck\').checked)"
+						+ "{"
+						+ "document.getElementById(\'location\').disabled=0;"
+						+ "}"
+						+ "else"
+						+ "{"
+						+ "document.getElementById(\'location\').disabled=1;"
+						+ "}"
+						+ "}"
+						+"</script>"
+						+"</head>"
 						+ "<form name=\"input\" action=\"goto\" method=\"post\">"
 						+ "Username: <input type=\"text\" name=\"user\">"
 						+ "<br>"
 						+ "Password: <input type=\"password\" name=\"pwd\">"
-						+ "<br>" + "<input type=\"submit\" value=\"Submit\">"
+						+ "<br>"
+						+ "Location Name: <input type=\"text\" id=\"location\" disabled>"
+						+ "<input type=\"checkbox\" id=\"locationcheck\" value=\"true\" onClick=\"codename()\">"
+						+ "Select to login using device location awareness<br>"
+						+ "<br>"
+						+ "<input type=\"submit\" value=\"Submit\">"
 						+ "</form>";
 			}
 
@@ -52,8 +71,12 @@ public class WebServer {
 
 				String username = request.queryMap().get("user").value();
 				String pass = request.queryMap().get("pwd").value();
+				String locationName = null;
+				if(request.queryMap().get("locationcheck").value() == "true"){
+					 request.queryMap().get("location").value();
+				}
 				proto = new ServerProtocol(ahs);
-				authenticated = proto.authenticate(username, pass);
+				authenticated = proto.authenticate(username, pass, locationName);
 				if (!authenticated) {
 					halt(401, "You are not welcome here");
 				}

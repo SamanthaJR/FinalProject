@@ -38,12 +38,16 @@ public class ServerProtocol {
 	 *            a single correct string of "123"
 	 * @return true if correct password/username combination. False if not.
 	 */
-	public boolean authenticate(String u, String p) {
+	public boolean authenticate(String u, String p, String l) {
 
 		// check username and password match up correctly
 		// if not, not allowed in
 		// else get regid for username (this is the google specified
 		// registration ID for GCM services)
+		// if l not null, check database for u, p, l 
+		// if no matching location name present, not allowed in
+		// if location name present but device not in geofence, not allowed in
+		// if location name present & device in geofence, allow entry
 		// postToGCM with this regid
 		// wait for event to fire with user response
 		// allow or disallow login accordingly
