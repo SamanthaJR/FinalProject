@@ -9,6 +9,7 @@ package serverPackage;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.sql.*;
+
 import javax.sql.*;
 
 public class ServerProtocol {
@@ -60,7 +61,7 @@ public class ServerProtocol {
 				id = usrnm.getString(1);
 				String user = usrnm.getString(2);
 				String pass = usrnm.getString(3);
-				if (u.contentEquals(user) && p.contentEquals(pass)) {
+				if (u.contentEquals(user) && p.contentEquals(pass) && l == null) {
 					ahs.setId(this);
 					System.out.println("SP: Posting to GCMS");
 					gcm.postToGCM(id);
@@ -72,6 +73,8 @@ public class ServerProtocol {
 						e.printStackTrace();
 						return false;
 					}
+				} else if (u.contentEquals(user) && p.contentEquals(pass) && l != null){
+					return checkLocationPresent(dbConn, l);
 				}
 				return decision;
 			} else {
@@ -82,6 +85,16 @@ public class ServerProtocol {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	private boolean checkLocationPresent(Connection dbConn, String locName) throws SQLException {
+		PreparedStatement stmnt = dbConn.prepareStatement("SELECT * " + "FROM locations"
+				+ " WHERE reg_id = ? " + "AND location_name = ? " + "AND in_geofence = true;");
+		stmnt.setString(1, id);
+		stmnt.setString(2, locName);
+		System.out.println(stmnt.toString());
+		ResultSet locSet = stmnt.executeQuery();
+		return locSet.next();
 	}
 
 	/**

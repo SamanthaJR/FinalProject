@@ -49,8 +49,8 @@ public class WebServer {
 						+ "<br>"
 						+ "Password: <input type=\"password\" name=\"pwd\">"
 						+ "<br>"
-						+ "Location Name: <input type=\"text\" id=\"location\" disabled>"
-						+ "<input type=\"checkbox\" id=\"locationcheck\" value=\"true\" onClick=\"codename()\">"
+						+ "Location Name: <input type=\"text\" id=\"location\" name=\"location\" disabled>"
+						+ "<input type=\"checkbox\" id=\"locationcheck\" name=\"locationcheck\" value=\"true\" onClick=\"codename()\">"
 						+ "Select to login using device location awareness<br>"
 						+ "<br>"
 						+ "<input type=\"submit\" value=\"Submit\">"
@@ -72,8 +72,9 @@ public class WebServer {
 				String username = request.queryMap().get("user").value();
 				String pass = request.queryMap().get("pwd").value();
 				String locationName = null;
-				if(request.queryMap().get("locationcheck").value() == "true"){
-					 request.queryMap().get("location").value();
+				boolean b = request.queryMap().get("location").hasValue();
+				if(b){
+					locationName = request.queryMap().get("location").value();
 				}
 				proto = new ServerProtocol(ahs);
 				authenticated = proto.authenticate(username, pass, locationName);
