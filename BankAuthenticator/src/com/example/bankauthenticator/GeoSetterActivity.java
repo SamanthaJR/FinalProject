@@ -61,7 +61,7 @@ OnAddGeofencesResultListener{
 		// Instantiate a new geofence storage area
         mGeofenceStorage = new SimpleGeofenceStore(this);
 
-//         Instantiate the current List of geofences
+//      Instantiate the current List of geofences
         mCurrentGeofences = new ArrayList<Geofence>();
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(GeofenceUtils.ACTION_GEOFENCES_ADDED);
@@ -193,10 +193,10 @@ OnAddGeofencesResultListener{
 		launchToast("Location Services connected!");
 
 		mCurrentLocation = mLocationClient.getLastLocation();
-		launchToast("lat = "
-					+ String.valueOf(mCurrentLocation.getLatitude())
-					+ "long = "
-					+ String.valueOf(mCurrentLocation.getLongitude()));
+//		launchToast("lat = "
+//					+ String.valueOf(mCurrentLocation.getLatitude())
+//					+ "long = "
+//					+ String.valueOf(mCurrentLocation.getLongitude()));
 		createGeofences(mCurrentLocation.getLatitude(),
 				mCurrentLocation.getLongitude(), radius, locName);
 		getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), radius);
@@ -206,8 +206,8 @@ OnAddGeofencesResultListener{
 
 	@Override
 	public void onDisconnected() {
-		Toast.makeText(this, "Location Services disconnected.",
-                Toast.LENGTH_SHORT).show();		
+//		Toast.makeText(this, "Location Services disconnected.",
+//                Toast.LENGTH_SHORT).show();		
 //		mLocationClient = null;
 	}
 	
@@ -248,7 +248,7 @@ OnAddGeofencesResultListener{
 	public void onAddGeofencesResult(int statusCode, String[] arg1) {
 		if (LocationStatusCodes.SUCCESS == statusCode) {
             Log.d("LocAct: ", "Succesful addition of Geofence");
-            launchToast("Successful addition of Geofence");
+//            launchToast("Successful addition of Geofence");
             mResult.setText(R.string.success_add_geofence);
             mLocationClient.disconnect();
         } else {

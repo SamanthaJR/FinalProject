@@ -127,15 +127,22 @@ public class AppClient {
 			char[] passphrase = "SecureLock".toCharArray();
 			KeyStore ksTrust = KeyStore.getInstance("BKS");
 			ksTrust.load(
-					cntx.getResources().openRawResource(R.raw.clientstore),
+					cntx.getResources().openRawResource(R.raw.clienttruststore),
 					passphrase);
 			TrustManagerFactory tmf = TrustManagerFactory
 					.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 			tmf.init(ksTrust);
+			
+			KeyStore keyStore = KeyStore.getInstance("PKCS12");
+			keyStore.load(cntx.getResources().openRawResource(R.raw.clientptwel),passphrase);
+			KeyManagerFactory kmf = KeyManagerFactory
+					.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			   kmf.init(keyStore, passphrase);
+
 
 			// Create a SSLContext with the certificate
 			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
+			sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom()); 
 
 			// Create a secure socket, wrap input and output to PrintWriter and
 			// BufferedReader.

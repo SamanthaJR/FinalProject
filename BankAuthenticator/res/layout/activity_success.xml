@@ -9,9 +9,14 @@
     tools:context=".SuccessActivity" >
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/HeadingFont"
+        android:id="@+id/success_heading_text"
+        android:text="@string/hello_world" />
+    
+    <TextView
+        style="@style/SubHeadingFont"
         android:id="@+id/success_text"
+        android:layout_below="@+id/success_heading_text"
         android:text="@string/hello_world" />
 
 </RelativeLayout>

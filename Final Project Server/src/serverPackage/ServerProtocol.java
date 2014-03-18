@@ -92,7 +92,7 @@ public class ServerProtocol {
 				+ " WHERE reg_id = ? " + "AND location_name = ? " + "AND in_geofence = true;");
 		stmnt.setString(1, id);
 		stmnt.setString(2, locName);
-		System.out.println(stmnt.toString());
+		System.out.println("Checking Location");
 		ResultSet locSet = stmnt.executeQuery();
 		return locSet.next();
 	}

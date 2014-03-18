@@ -49,11 +49,15 @@ public class AppHomeServer {
 		}
 
 		try {
+//			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/.java/deployment/security/trusted.certs");
+			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/work/SSC2/DBex2/Final Project Server/trusted.certs");
+			
 			// Setup a secure TCP socket.
 			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory
 					.getDefault();
 			SSLServerSocket listener = (SSLServerSocket) factory
 					.createServerSocket(4444);
+			listener.setNeedClientAuth(true);
 			System.out.println("AHS: Started, Listening to port 4444");
 			SSLSocket server;
 
@@ -74,6 +78,7 @@ public class AppHomeServer {
 					System.out.println("Finished!");
 				} catch (TimeoutException e) {
 					System.out.println("Terminated!");
+					t.fireResponseEvent(false, t.getRegid());
 					t.removeElement();
 					t.closeClientConnection();
 				} catch (InterruptedException e) {
@@ -176,7 +181,7 @@ class doComms implements Runnable {
 				details = new char[length];
 				is.read(details, 0, length);
 				String regDetails = String.valueOf(details);
-				System.out.println(regDetails);
+//				System.out.println(regDetails);
 				String[] regDetArr = regDetails.split("\\^");
 
 				ResultSet regidSet = checkRegDetails(regDetArr[0]);
@@ -215,7 +220,7 @@ class doComms implements Runnable {
 				// read registration id
 				is.read(regid, 0, 183);
 				String id = String.valueOf(regid);
-				System.out.println(id);
+//				System.out.println(id);
 				System.out.println("Waiting for response");
 
 				// read accept or decline
@@ -316,6 +321,10 @@ class doComms implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public String getRegid(){
+		return String.valueOf(regid);
+	}
 
 	/**
 	 * Method called when the server is alerted by the device that the user has
@@ -363,7 +372,7 @@ class doComms implements Runnable {
 			int uLen = Integer.parseInt(String.valueOf(radLen));
 			// System.out.println("uLen is: " + String.valueOf(uLen));
 			is.read(locInfo, 0, uLen);
-			System.out.println(String.valueOf(locInfo));
+//			System.out.println(String.valueOf(locInfo));
 			String info = "";
 			for (int i = 0; i < uLen; i++) {
 				info += locInfo[i];
@@ -599,7 +608,7 @@ class doComms implements Runnable {
 	 *            identified and logged in (or not) without affecting the
 	 *            others.
 	 */
-	private synchronized void fireResponseEvent(boolean b, String id) {
+	public synchronized void fireResponseEvent(boolean b, String id) {
 
 		ResponseEvent response = new ResponseEvent(this, id, b);
 		ListIterator<ServerProtocol> it = AppHomeServer.listenerQueue
@@ -639,6 +648,7 @@ class doComms implements Runnable {
 			if (tempProto.getId().equalsIgnoreCase(String.valueOf(regid))) {
 				// remove element
 				it.remove();
+				System.out.println("Login Request Removed from List");
 			}
 		}
 	}

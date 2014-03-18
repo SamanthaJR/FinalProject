@@ -155,82 +155,89 @@ containing a value of this type.
         public static final int activity_vertical_margin=0x7f080001;
     }
     public static final class drawable {
-        public static final int btn_stat_notify_securelock=0x7f020000;
-        public static final int common_signin_btn_icon_dark=0x7f020001;
-        public static final int common_signin_btn_icon_disabled_dark=0x7f020002;
-        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020003;
-        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020004;
-        public static final int common_signin_btn_icon_disabled_light=0x7f020005;
-        public static final int common_signin_btn_icon_focus_dark=0x7f020006;
-        public static final int common_signin_btn_icon_focus_light=0x7f020007;
-        public static final int common_signin_btn_icon_light=0x7f020008;
-        public static final int common_signin_btn_icon_normal_dark=0x7f020009;
-        public static final int common_signin_btn_icon_normal_light=0x7f02000a;
-        public static final int common_signin_btn_icon_pressed_dark=0x7f02000b;
-        public static final int common_signin_btn_icon_pressed_light=0x7f02000c;
-        public static final int common_signin_btn_text_dark=0x7f02000d;
-        public static final int common_signin_btn_text_disabled_dark=0x7f02000e;
-        public static final int common_signin_btn_text_disabled_focus_dark=0x7f02000f;
-        public static final int common_signin_btn_text_disabled_focus_light=0x7f020010;
-        public static final int common_signin_btn_text_disabled_light=0x7f020011;
-        public static final int common_signin_btn_text_focus_dark=0x7f020012;
-        public static final int common_signin_btn_text_focus_light=0x7f020013;
-        public static final int common_signin_btn_text_light=0x7f020014;
-        public static final int common_signin_btn_text_normal_dark=0x7f020015;
-        public static final int common_signin_btn_text_normal_light=0x7f020016;
-        public static final int common_signin_btn_text_pressed_dark=0x7f020017;
-        public static final int common_signin_btn_text_pressed_light=0x7f020018;
-        public static final int ic_dialog_securelock=0x7f020019;
-        public static final int ic_launcher=0x7f02001a;
-        public static final int ic_launcher_securelock=0x7f02001b;
-        public static final int ic_list_securelock=0x7f02001c;
-        public static final int ic_menu_securelock=0x7f02001d;
-        public static final int ic_plusone_medium_off_client=0x7f02001e;
-        public static final int ic_plusone_small_off_client=0x7f02001f;
-        public static final int ic_plusone_standard_off_client=0x7f020020;
-        public static final int ic_plusone_tall_off_client=0x7f020021;
-        public static final int ic_stat_notify_securelock=0x7f020022;
-        public static final int ic_tab_securelock=0x7f020023;
-        public static final int market_securelock=0x7f020024;
+        public static final int action_bar_colour=0x7f020000;
+        public static final int btn_stat_notify_securelock=0x7f020001;
+        public static final int button_shape=0x7f020002;
+        public static final int common_signin_btn_icon_dark=0x7f020003;
+        public static final int common_signin_btn_icon_disabled_dark=0x7f020004;
+        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020005;
+        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020006;
+        public static final int common_signin_btn_icon_disabled_light=0x7f020007;
+        public static final int common_signin_btn_icon_focus_dark=0x7f020008;
+        public static final int common_signin_btn_icon_focus_light=0x7f020009;
+        public static final int common_signin_btn_icon_light=0x7f02000a;
+        public static final int common_signin_btn_icon_normal_dark=0x7f02000b;
+        public static final int common_signin_btn_icon_normal_light=0x7f02000c;
+        public static final int common_signin_btn_icon_pressed_dark=0x7f02000d;
+        public static final int common_signin_btn_icon_pressed_light=0x7f02000e;
+        public static final int common_signin_btn_text_dark=0x7f02000f;
+        public static final int common_signin_btn_text_disabled_dark=0x7f020010;
+        public static final int common_signin_btn_text_disabled_focus_dark=0x7f020011;
+        public static final int common_signin_btn_text_disabled_focus_light=0x7f020012;
+        public static final int common_signin_btn_text_disabled_light=0x7f020013;
+        public static final int common_signin_btn_text_focus_dark=0x7f020014;
+        public static final int common_signin_btn_text_focus_light=0x7f020015;
+        public static final int common_signin_btn_text_light=0x7f020016;
+        public static final int common_signin_btn_text_normal_dark=0x7f020017;
+        public static final int common_signin_btn_text_normal_light=0x7f020018;
+        public static final int common_signin_btn_text_pressed_dark=0x7f020019;
+        public static final int common_signin_btn_text_pressed_light=0x7f02001a;
+        public static final int ic_dialog_securelock=0x7f02001b;
+        public static final int ic_launcher=0x7f02001c;
+        public static final int ic_launcher_securelock=0x7f02001d;
+        public static final int ic_list_securelock=0x7f02001e;
+        public static final int ic_menu_securelock=0x7f02001f;
+        public static final int ic_plusone_medium_off_client=0x7f020020;
+        public static final int ic_plusone_small_off_client=0x7f020021;
+        public static final int ic_plusone_standard_off_client=0x7f020022;
+        public static final int ic_plusone_tall_off_client=0x7f020023;
+        public static final int ic_stat_notify_securelock=0x7f020024;
+        public static final int ic_tab_securelock=0x7f020025;
+        public static final int market_securelock=0x7f020026;
     }
     public static final class id {
-        public static final int action_settings=0x7f06001a;
-        public static final int confirm_password=0x7f06000b;
-        public static final int display=0x7f060015;
-        public static final int geofence_result=0x7f060007;
+        public static final int action_settings=0x7f060021;
+        public static final int button_heading=0x7f060005;
+        public static final int button_sub_heading=0x7f060006;
+        public static final int confirm_password=0x7f06000e;
+        public static final int display=0x7f060019;
+        public static final int explanation_text=0x7f06001d;
+        public static final int first_time_mess=0x7f06000b;
+        public static final int geofence_result=0x7f060009;
         public static final int hybrid=0x7f060004;
-        public static final int location_button=0x7f060018;
-        public static final int location_intro_field=0x7f06000d;
-        public static final int location_name=0x7f060011;
-        public static final int location_name_warning=0x7f060010;
-        public static final int location_password=0x7f06000f;
-        public static final int location_radius=0x7f060013;
-        public static final int location_radius_explanation=0x7f060012;
-        public static final int location_submit_button=0x7f060014;
-        public static final int location_username=0x7f06000e;
-        public static final int no_button=0x7f060005;
+        public static final int location_button=0x7f06001b;
+        public static final int location_explanation_text=0x7f06001e;
+        public static final int location_heading_field=0x7f060010;
+        public static final int location_intro_field=0x7f060011;
+        public static final int location_name=0x7f060015;
+        public static final int location_name_warning=0x7f060014;
+        public static final int location_password=0x7f060013;
+        public static final int location_radius=0x7f060017;
+        public static final int location_radius_explanation=0x7f060016;
+        public static final int location_submit_button=0x7f060018;
+        public static final int location_username=0x7f060012;
+        public static final int no_button=0x7f060007;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
-        public static final int password=0x7f06000a;
-        public static final int reg_mess=0x7f060008;
-        public static final int register_button=0x7f060017;
+        public static final int password=0x7f06000d;
+        public static final int reg_mess=0x7f06000a;
+        public static final int register_button=0x7f06001a;
         public static final int satellite=0x7f060002;
-        public static final int submit_button=0x7f06000c;
-        public static final int success_text=0x7f060019;
+        public static final int submit_button=0x7f06000f;
+        public static final int success_heading_text=0x7f06001f;
+        public static final int success_text=0x7f060020;
         public static final int terrain=0x7f060003;
-        public static final int username=0x7f060009;
-        public static final int welc_mess=0x7f060016;
-        public static final int yes_button=0x7f060006;
+        public static final int username=0x7f06000c;
+        public static final int welc_mess=0x7f06001c;
+        public static final int yes_button=0x7f060008;
     }
     public static final class layout {
         public static final int activity_button=0x7f030000;
         public static final int activity_geo_setter=0x7f030001;
         public static final int activity_launch=0x7f030002;
-        public static final int activity_load=0x7f030003;
-        public static final int activity_location=0x7f030004;
-        public static final int activity_main=0x7f030005;
-        public static final int activity_secure_lock=0x7f030006;
-        public static final int activity_success=0x7f030007;
+        public static final int activity_location=0x7f030003;
+        public static final int activity_main=0x7f030004;
+        public static final int activity_success=0x7f030005;
     }
     public static final class menu {
         public static final int button=0x7f0a0000;
@@ -243,10 +250,13 @@ containing a value of this type.
         public static final int success=0x7f0a0007;
     }
     public static final class raw {
-        public static final int clientstore=0x7f040000;
+        public static final int aclient=0x7f040000;
+        public static final int clientkeystore=0x7f040001;
+        public static final int clientptwel=0x7f040002;
+        public static final int clienttruststore=0x7f040003;
     }
     public static final class string {
-        public static final int accept_string=0x7f07001c;
+        public static final int accept_string=0x7f07001b;
         public static final int action_settings=0x7f07001a;
         public static final int app_name=0x7f070019;
         /**   Title for notification shown when GooglePlayServices needs to be
@@ -272,8 +282,8 @@ containing a value of this type.
         [CHAR LIMIT=70] 
          */
         public static final int auth_client_using_bad_version_title=0x7f070013;
-        public static final int awaiting_geo_conf=0x7f070032;
-        public static final int choose_button=0x7f07001f;
+        public static final int awaiting_geo_conf=0x7f070031;
+        public static final int choose_button=0x7f07001e;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
@@ -341,29 +351,38 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070012;
-        public static final int confirm_password_hint=0x7f070023;
-        public static final int decline_string=0x7f07001d;
-        public static final int fail_add_geofence=0x7f070034;
-        public static final int hello_world=0x7f07001b;
-        public static final int location_button_string=0x7f070029;
-        public static final int location_intro=0x7f07002b;
-        public static final int location_name_explanation=0x7f07002c;
-        public static final int location_name_hint=0x7f07002d;
-        public static final int password_hint=0x7f070022;
-        public static final int radius_explanation=0x7f07002e;
-        public static final int radius_hint=0x7f07002f;
-        public static final int reg_message=0x7f070027;
-        public static final int register_button_string=0x7f070028;
-        public static final int rtis=0x7f070030;
-        public static final int submit_button_string=0x7f070024;
-        public static final int success_add_geofence=0x7f070033;
-        public static final int title_activity_button=0x7f07001e;
-        public static final int title_activity_geo_setter=0x7f070031;
-        public static final int title_activity_launch=0x7f070026;
-        public static final int title_activity_location=0x7f07002a;
-        public static final int title_activity_success=0x7f070025;
-        public static final int username_hint=0x7f070021;
-        public static final int welcome_message=0x7f070020;
+        public static final int confirm_password_hint=0x7f070022;
+        public static final int decline_string=0x7f07001c;
+        public static final int explanation=0x7f070034;
+        public static final int fail_add_geofence=0x7f070033;
+        public static final int first_time_message=0x7f070037;
+        public static final int hello_world=0x7f070036;
+        public static final int location_button_string=0x7f070028;
+        public static final int location_explanation=0x7f070035;
+        public static final int location_heading=0x7f07003a;
+        public static final int location_intro=0x7f07002a;
+        public static final int location_name_explanation=0x7f07002b;
+        public static final int location_name_hint=0x7f07002c;
+        public static final int login_accepted=0x7f07003c;
+        public static final int login_attempt=0x7f07003b;
+        public static final int login_declined=0x7f07003d;
+        public static final int pass_hint=0x7f070039;
+        public static final int password_hint=0x7f070021;
+        public static final int radius_explanation=0x7f07002d;
+        public static final int radius_hint=0x7f07002e;
+        public static final int reg_message=0x7f070026;
+        public static final int register_button_string=0x7f070027;
+        public static final int rtis=0x7f07002f;
+        public static final int submit_button_string=0x7f070023;
+        public static final int success_add_geofence=0x7f070032;
+        public static final int title_activity_button=0x7f07001d;
+        public static final int title_activity_geo_setter=0x7f070030;
+        public static final int title_activity_launch=0x7f070025;
+        public static final int title_activity_location=0x7f070029;
+        public static final int title_activity_success=0x7f070024;
+        public static final int user_hint=0x7f070038;
+        public static final int username_hint=0x7f070020;
+        public static final int welcome_message=0x7f07001f;
     }
     public static final class style {
         /** 
@@ -392,6 +411,9 @@ containing a value of this type.
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f090001;
+        public static final int ButtonStyle=0x7f090002;
+        public static final int HeadingFont=0x7f090003;
+        public static final int SubHeadingFont=0x7f090004;
     }
     public static final class styleable {
         /** Attributes that can be used with a MapAttrs.

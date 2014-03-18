@@ -16,11 +16,14 @@ public class SuccessActivity extends Activity {
 		Intent intent = getIntent();
 		String message = intent.getStringExtra(ButtonActivity.USER_RESPONSE);
 		TextView t = (TextView) findViewById(R.id.success_text);
+		TextView h = (TextView) findViewById(R.id.success_heading_text);
 		if (message.equalsIgnoreCase("accept")) {
 			t.setText("You have successfully allowed the login! Please return to your browser.");
+			h.setText(R.string.login_accepted);
 		} else {
 			t.setText("You have successfully declined the login. " +
 					  "Please contact your bank for more information on keeping your account secure.");
+			h.setText(R.string.login_declined);
 		}
 	}
 

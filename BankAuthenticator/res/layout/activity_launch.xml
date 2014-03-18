@@ -9,17 +9,23 @@
     tools:context=".LaunchActivity" >
 
     <TextView
+        style="@style/HeadingFont"
         android:id="@+id/reg_mess"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="@string/reg_message" />
+    
+    <TextView
+        style="@style/SubHeadingFont"
+        android:id="@+id/first_time_mess"
+        android:layout_below="@id/reg_mess"
+        android:text="@string/first_time_message" />
 
     <EditText
         android:id="@+id/username"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/reg_mess"
         android:hint="@string/username_hint"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/first_time_mess"
         android:inputType="text" />
 
     <EditText
@@ -37,15 +43,18 @@
         android:hint="@string/confirm_password_hint"
         android:layout_below="@+id/password"
         android:inputType="textPassword" />
-    
+
      <Button
-        android:id="@+id/submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center_vertical"
-        android:text="@string/submit_button_string"
-        android:onClick="submitClick"
-        android:visibility="visible" />
+         android:id="@+id/submit_button"
+         style="@style/ButtonStyle"
+         android:layout_height="wrap_content"
+         android:layout_centerHorizontal="true"
+         android:layout_centerVertical="true"
+         android:layout_marginTop="50dp"
+         android:layout_below="@id/confirm_password"
+         android:onClick="submitClick"
+         android:text="@string/submit_button_string"
+         android:visibility="visible" 
+         android:layout_width="170dp"/>
 
 </RelativeLayout>

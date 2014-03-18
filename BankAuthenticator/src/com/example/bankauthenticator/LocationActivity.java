@@ -180,10 +180,10 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 //					mCurrentLocation.getLongitude(), Float.parseFloat(radius),
 //					name);
 
-			launchToast("lat = "
-					+ String.valueOf(mCurrentLocation.getLatitude())
-					+ "long = "
-					+ String.valueOf(mCurrentLocation.getLongitude()));
+////			launchToast("lat = "
+//					+ String.valueOf(mCurrentLocation.getLatitude())
+//					+ "long = "
+//					+ String.valueOf(mCurrentLocation.getLongitude()));
 			
 			Intent nt = new Intent(this, GeoSetterActivity.class);
 			nt.setClassName("com.example.bankauthenticator",
@@ -276,13 +276,13 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 
 	@Override
 	public void onConnected(Bundle arg0) {
-		launchToast("Location Services connected!");
+//		launchToast("Location Services connected!");
 
 		mCurrentLocation = mLocationClient.getLastLocation();
-		launchToast("lat = "
-					+ String.valueOf(mCurrentLocation.getLatitude())
-					+ "long = "
-					+ String.valueOf(mCurrentLocation.getLongitude()));
+//		launchToast("lat = "
+//					+ String.valueOf(mCurrentLocation.getLatitude())
+//					+ "long = "
+//					+ String.valueOf(mCurrentLocation.getLongitude()));
 //		createGeofences(mCurrentLocation.getLatitude(),
 //				mCurrentLocation.getLongitude(), 2000, "onConnect");
 //		getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), 2000);
