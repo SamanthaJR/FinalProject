@@ -56,5 +56,49 @@
          android:text="@string/submit_button_string"
          android:visibility="visible" 
          android:layout_width="170dp"/>
+     
+     
+       <TextView
+        style="@style/HeadingFont"
+        android:id="@+id/dereg_mess"
+        android:layout_below="@id/submit_button"
+        android:layout_marginTop="20dp"
+        android:text="@string/dereg_message" />
+    
+    <TextView
+        style="@style/SubHeadingFont"
+        android:id="@+id/remove_mess"
+        android:layout_below="@id/dereg_mess"
+        android:text="@string/remove_message" />
+
+    <EditText
+        android:id="@+id/deregusername"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/user_hint"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/remove_mess"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/deregpassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/pass_hint"
+        android:layout_below="@+id/deregusername"
+        android:inputType="textPassword" />
+    
+    <Button
+         android:id="@+id/dereg_submit_button"
+         style="@style/ButtonStyle"
+         android:layout_height="wrap_content"
+         android:layout_centerHorizontal="true"
+         android:layout_centerVertical="true"
+         android:layout_marginTop="50dp"
+         android:layout_below="@id/deregpassword"
+         android:onClick="deregSubmitClick"
+         android:text="@string/submit_button_string"
+         android:visibility="visible" 
+         android:layout_width="170dp"/>
 
 </RelativeLayout>

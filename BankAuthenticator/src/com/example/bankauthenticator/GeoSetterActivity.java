@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.android.gms.common.*;
 import com.google.android.gms.location.*;
 import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
+import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
 
 import android.location.*;
 import android.os.AsyncTask;
@@ -31,9 +32,9 @@ import android.os.Build;
 public class GeoSetterActivity extends Activity implements
 GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener,
-OnAddGeofencesResultListener{
+OnAddGeofencesResultListener, OnRemoveGeofencesResultListener{
 
-	TextView mResult;
+	TextView mResult, mSubHeading;
 	private int locLen;
 	private AppClient mAppClient;
 	private Location mCurrentLocation;
@@ -43,7 +44,8 @@ OnAddGeofencesResultListener{
     private SimpleGeofenceStore mGeofenceStorage;
     PendingIntent mTransitionPendingIntent;
     IntentFilter mIntentFilter;
-    String lat, longit, locName, regid;
+    private String task, lat, longit, regid, all;
+    private ArrayList<String> locName;
     float radius;
 	
 	@Override
@@ -54,10 +56,13 @@ OnAddGeofencesResultListener{
 		setupActionBar();
 		Intent intent = getIntent();
 		radius = intent.getFloatExtra("RADIUS_EXTRA", 100);
-		locName = intent.getStringExtra("LOCATION_NAME");
+		locName = (ArrayList<String>) intent.getSerializableExtra("LOCATION_NAMES");
 		regid = intent.getStringExtra("REG_ID");
+		task = intent.getStringExtra("TASK");
+		all = intent.getStringExtra("DEREG_ALERT");
 		mLocationClient = new LocationClient(this, this, this);
 		mResult = (TextView) findViewById(R.id.geofence_result);
+		mSubHeading = (TextView) findViewById(R.id.rereg_hint);
 		// Instantiate a new geofence storage area
         mGeofenceStorage = new SimpleGeofenceStore(this);
 
@@ -190,7 +195,9 @@ OnAddGeofencesResultListener{
 
 	@Override
 	public void onConnected(Bundle arg0) {
-		launchToast("Location Services connected!");
+//		launchToast("Location Services connected!");
+		
+		if(task.contentEquals("add")){
 
 		mCurrentLocation = mLocationClient.getLastLocation();
 //		launchToast("lat = "
@@ -198,9 +205,12 @@ OnAddGeofencesResultListener{
 //					+ "long = "
 //					+ String.valueOf(mCurrentLocation.getLongitude()));
 		createGeofences(mCurrentLocation.getLatitude(),
-				mCurrentLocation.getLongitude(), radius, locName);
+				mCurrentLocation.getLongitude(), radius, locName.get(0));
 		getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), radius);
 		mLocationClient.addGeofences(mCurrentGeofences, mTransitionPendingIntent, this);
+		} else if (task.contentEquals("remove")){
+			mLocationClient.removeGeofences(locName, this);
+		}
 		
 	}
 
@@ -255,6 +265,43 @@ OnAddGeofencesResultListener{
         	Log.e("LocAct:", "Error adding geofences");
         	Log.e("LocAct: ", "StatusCode = " + statusCode);
         	mResult.setText(R.string.fail_add_geofence);
+        	mLocationClient.disconnect();
+        }
+
+	}
+
+	@Override
+	public void onRemoveGeofencesByPendingIntentResult(int statusCode,
+			PendingIntent arg1) {
+		if (LocationStatusCodes.SUCCESS == statusCode) {
+            Log.d("LocAct: ", "Succesful removal of Geofence");
+//            launchToast("Successful addition of Geofence");
+            mResult.setText(R.string.success_remove_geofence);
+            mLocationClient.disconnect();
+        } else {
+        	Log.e("LocAct:", "Error removing geofences");
+        	Log.e("LocAct: ", "StatusCode = " + statusCode);
+        	mResult.setText(R.string.fail_remove_geofence);
+        	mLocationClient.disconnect();
+        }
+	}
+
+	@Override
+	public void onRemoveGeofencesByRequestIdsResult(int statusCode, String[] arg1) {
+		if (LocationStatusCodes.SUCCESS == statusCode && all == null) {
+            Log.d("LocAct: ", "Succesful removal of Geofence");
+//            launchToast("Successful addition of Geofence");
+            mResult.setText(R.string.success_remove_geofence);
+            mLocationClient.disconnect();
+		} else if (LocationStatusCodes.SUCCESS == statusCode && all.equalsIgnoreCase("all")) {
+			Log.d("LocAct: ", "Succesful removal of all Geofences");
+			mResult.setText(R.string.success_dereg);
+			mSubHeading.setVisibility(View.VISIBLE);
+            mLocationClient.disconnect();
+        } else {
+        	Log.e("LocAct:", "Error removing geofences");
+        	Log.e("LocAct: ", "StatusCode = " + statusCode);
+        	mResult.setText(R.string.fail_remove_geofence);
         	mLocationClient.disconnect();
         }
 

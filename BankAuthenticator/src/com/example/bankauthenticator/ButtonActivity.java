@@ -4,11 +4,18 @@
  */
 package com.example.bankauthenticator;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +28,9 @@ import android.widget.Toast;
 public class ButtonActivity extends Activity {
 	
 	public final static String USER_RESPONSE = "com.example.bankauthenticator.RESPONSE";
+	private final int delayTime = 60000;
+	private Handler timeoutHandler = new Handler();
+
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
@@ -36,6 +46,7 @@ public class ButtonActivity extends Activity {
 		acc.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				timeoutHandler.removeCallbacks(timeoutTask);
 				SendTask st = new SendTask();
 				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Accepted");
 				startSuccessAct("accept");
@@ -47,6 +58,7 @@ public class ButtonActivity extends Activity {
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				timeoutHandler.removeCallbacks(timeoutTask);
 				SendTask st = new SendTask();
 				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Declined");
 				startSuccessAct("decline");	
@@ -54,6 +66,16 @@ public class ButtonActivity extends Activity {
 		});
 
 	}
+	
+	/*
+     * Called when the Activity becomes visible.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //start the timeout feature
+        timeoutHandler.postDelayed(timeoutTask, delayTime);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,7 +112,12 @@ public class ButtonActivity extends Activity {
 		}
 
 	}
-
 	
+	private Runnable timeoutTask = new Runnable() {
+		public void run() {
+			finish();
+			startSuccessAct("Timeout");
+		}
+	};
 	
 }

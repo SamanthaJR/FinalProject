@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class LaunchActivity extends Activity {
 
 	Button mSubmitBtn;
-	EditText mUsername, mPassword, mConfPass;
+	EditText mUsername, mPassword, mConfPass, mDeregUsername, mDeregPass;
 	private AppClient mAppClient;
 	String usernm, pass, regid;
 	int regLen;
@@ -33,6 +33,9 @@ public class LaunchActivity extends Activity {
 		mPassword = (EditText) findViewById(R.id.password);
 		mConfPass = (EditText) findViewById(R.id.confirm_password);
 		mSubmitBtn = (Button) findViewById(R.id.submit_button);
+		
+		mDeregUsername = (EditText) findViewById(R.id.deregusername);
+		mDeregPass = (EditText) findViewById(R.id.deregpassword);
 		
 		Intent intent = getIntent();
 		regid = intent.getStringExtra("USER_REGID");
@@ -102,8 +105,27 @@ public class LaunchActivity extends Activity {
 				int passLen = pass.length();
 				regLen = 183 + usernmLen + passLen + 2;
 
-				new connectRegTask().execute("");
+				new connectRegTask().execute("registering");
 			}
+		}
+	}
+	
+	public void deregSubmitClick(View view) {
+
+		usernm = mDeregUsername.getText().toString();
+		pass = mDeregPass.getText().toString();
+
+		if (usernm.length() == 0 || pass.length() == 0 ) {
+			launchToast("Please ensure all fields are filled out.");
+		} else {
+
+			
+				// calc lengths of vals from text zones
+				int usernmLen = usernm.length();
+				int passLen = pass.length();
+				regLen = 183 + usernmLen + passLen + 2;
+				
+				new connectRegTask().execute("de-register");
 		}
 	}
 
@@ -135,7 +157,7 @@ public class LaunchActivity extends Activity {
 
 			// we create a TCPClient object and pass to it all the data it
 			// needs.
-			mAppClient = new AppClient(getApplicationContext(), "registering", regLen,
+			mAppClient = new AppClient(getApplicationContext(), message[0], regLen,
 					regid, usernm, pass, "", "", "", "");
 			mAppClient.run();
 

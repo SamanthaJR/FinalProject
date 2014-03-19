@@ -12,5 +12,12 @@
         style="@style/HeadingFont"
         android:id="@+id/geofence_result"
         android:text="@string/awaiting_geo_conf" />
+    
+     <TextView
+        style="@style/SubHeadingFont"
+        android:id="@+id/rereg_hint"
+        android:text="@string/rereg_hint_text"
+        android:layout_below="@+id/geofence_result"
+        android:visibility="invisible" />
 
 </RelativeLayout>

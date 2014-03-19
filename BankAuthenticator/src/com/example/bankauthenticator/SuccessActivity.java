@@ -18,12 +18,14 @@ public class SuccessActivity extends Activity {
 		TextView t = (TextView) findViewById(R.id.success_text);
 		TextView h = (TextView) findViewById(R.id.success_heading_text);
 		if (message.equalsIgnoreCase("accept")) {
-			t.setText("You have successfully allowed the login! Please return to your browser.");
+			t.setText(R.string.login_accepted_subheading);
 			h.setText(R.string.login_accepted);
-		} else {
-			t.setText("You have successfully declined the login. " +
-					  "Please contact your bank for more information on keeping your account secure.");
+		} else if (message.equalsIgnoreCase("decline")) {
+			t.setText(R.string.login_declined_subheading);
 			h.setText(R.string.login_declined);
+		} else if (message.equalsIgnoreCase("Timeout")) {
+			t.setText(R.string.login_timeout_subheading);
+			h.setText(R.string.login_timeout);
 		}
 	}
 

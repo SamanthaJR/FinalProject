@@ -14,6 +14,9 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.sql.*;
 
+import org.eclipse.jetty.server.Authentication.SendSuccess;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Timer;
@@ -215,6 +218,51 @@ class doComms implements Runnable {
 				closeClientConnection();
 
 				// If required to authenticate:
+			} else if (checkMessage(task, "de-register")) {
+				System.out.println("Removing client registration");
+				
+				is.read(len, 0, 3);
+				System.out.println(Integer.parseInt(new String(len)));
+				int length = Integer.parseInt(new String(len));
+				details = new char[length];
+				is.read(details, 0, length);
+				String regDetails = String.valueOf(details);
+//				System.out.println(regDetails);
+				String[] regDetArr = regDetails.split("\\^");
+				
+				// check password regid and username all correct
+				// if not, return a message to client saying to try again
+				// if so, remove details, send message to client saying success
+				if(passUserMatch(regDetArr[1], regDetArr[2], regDetArr[0])){
+					//read all location names under this regid
+					//send number of location names back to client
+					//send all location names back to client
+					//remove all location names under this regid from locations table
+					ArrayList<String> allLocs = getAllUserLocationNames(regDetArr[0]);
+					out.println("Successfully removed registration Client");
+					int noOfLocs = allLocs.size();
+					out.println(noOfLocs);
+					for(int j = 0; j < noOfLocs; j++){
+						out.println(allLocs.get(j));
+					}
+					removeAllUserLocs(regDetArr[0]);
+					removeReg(regDetArr[0]);		
+				} else {
+					ResultSet rset = checkRegDetails(regDetArr[0]);
+					try {
+						if(rset.next()){
+						out.println("Login details incorrect Client");
+						} else {
+							out.println("Successfully removed registration Client");
+						}
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				closeClientConnection();
+				
 			} else if (checkMessage(task, "user log in")) {
 				System.out.println("Authenticating");
 				// read registration id
@@ -272,7 +320,7 @@ class doComms implements Runnable {
 								System.out.println("Username Taken Client");
 							} else {
 								boolean check = passUserMatch(username,
-										password);
+										password, String.valueOf(regid));
 								if (!check) {
 									out.println("Login details incorrect Client");
 									System.out
@@ -301,6 +349,51 @@ class doComms implements Runnable {
 					}
 				}
 				closeClientConnection();
+			} else if (checkMessage(task, "delLocation")) {
+				is.read(regid, 0, 183);
+				String username = readLocVal();
+				String password = readLocVal();
+				String locName = readLocVal();
+				
+				ResultSet regidSet = checkRegDetails(String.valueOf(regid));
+
+				if (regidSet != null) {
+					try {
+						if (!regidSet.next()) {
+							out.println("Device not Registered Client");
+							System.out.println("Device not Registered Client");
+						} else {
+							ResultSet userSet = checkUsernmDetails(username);
+							// if username already taken, statement is true
+							if (!userSet.next()) {
+								out.println("Login Details Incorrect Client");
+								System.out.println("Username Taken Client");
+							} else {
+								boolean check = passUserMatch(username,
+										password, String.valueOf(regid));
+								if (!check) {
+									out.println("Login details incorrect Client");
+									System.out
+											.println("Adding location, Password and Username do not match.");
+								} else {
+										deleteLocation(String.valueOf(regid),
+												username, password, locName);
+//										out.println("Location successfully deleted Client");
+										System.out
+												.println("Location successfully deleted");
+									
+								}
+							}
+						}
+					} catch (SQLException e) {
+						System.out
+								.println("AHS: SQL Exception when adding location");
+						e.printStackTrace();
+					}
+				}
+				closeClientConnection();
+				
+				
 			} else if (checkMessage(task, "locationing")) {
 				System.out.println("locationing");
 				is.read(regid, 0, 183);
@@ -322,6 +415,72 @@ class doComms implements Runnable {
 		}
 	}
 	
+	private void removeAllUserLocs(String reg){
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("DELETE FROM locations" + " WHERE reg_id = ?");
+			stmnt.setString(1, reg);
+			stmnt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("AHS: Problem deleting all user locations");
+			e.printStackTrace();
+		}
+	}
+
+	private ArrayList<String> getAllUserLocationNames(String reg) {
+		PreparedStatement stmnt;
+		try {
+			stmnt = dbConn
+					.prepareStatement("SELECT location_name FROM locations" + " WHERE reg_id= ?");
+			stmnt.setString(1, reg);
+			ResultSet set = stmnt.executeQuery();
+			ArrayList<String> returnStrings = new ArrayList<String>();
+			while(set.next()){
+				returnStrings.add(set.getString("location_name"));
+			}
+			return returnStrings;
+		} catch (SQLException e) {
+			System.out.println("AHS: Problem selecting all user locations");
+			e.printStackTrace();
+			return null;		
+		}
+		
+	}
+
+	private void deleteLocation(String reg, String username,
+			String password, String locName) {
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("DELETE FROM locations WHERE reg_id = ? AND username = ? AND password = ? AND location_name = ?");
+			stmnt.setString(1, reg);
+			stmnt.setString(2, username);
+			stmnt.setString(3, password);
+			stmnt.setString(4, locName);
+			stmnt.executeUpdate();
+			out.println("Successfully removed location Client");
+		} catch (SQLException e) {
+			System.out
+			.println("AHS: " + "Problem removing location info");
+			e.printStackTrace();
+			out.println("Error removing location Client");
+		}
+	}
+
+	private void removeReg(String reg) {
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("DELETE FROM userinfo WHERE reg_id = ?");
+			stmnt.setString(1, reg);
+			stmnt.executeUpdate();
+			out.println("Successfully removed registration Client");
+		} catch (SQLException e) {
+			System.out
+			.println("AHS: " + "Problem removing registration info");
+			e.printStackTrace();
+			out.println("Error removing registration Client");
+		}
+	}
+
 	public String getRegid(){
 		return String.valueOf(regid);
 	}
@@ -435,13 +594,14 @@ class doComms implements Runnable {
 	 * @return - true if the password goes with the associated username, false
 	 *         if they do not match or if the username doesn't exist.
 	 */
-	private boolean passUserMatch(String user, String pass) {
+	private boolean passUserMatch(String user, String pass, String regid) {
 		try {
 			PreparedStatement passDetails = dbConn.prepareStatement("SELECT * "
 					+ "FROM userinfo "
-					+ "WHERE password = ?  AND user_name = ?");
+					+ "WHERE password = ?  AND user_name = ? AND reg_id = ?");
 			passDetails.setString(1, pass);
 			passDetails.setString(2, user);
+			passDetails.setString(3,  regid);
 			ResultSet rs = passDetails.executeQuery();
 			return rs.next();
 		} catch (SQLException e) {

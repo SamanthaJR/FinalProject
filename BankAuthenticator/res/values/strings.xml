@@ -15,7 +15,7 @@
     <string name="title_activity_success">SecureLock</string>
     <string name="title_activity_launch">Register</string>
     <string name="reg_message">Register your Device</string>
-    <string name="register_button_string">Register Device</string>
+    <string name="register_button_string">Device Registration</string>
     <string name="location_button_string">Add Safe Location</string>
     <string name="title_activity_location">Add Current Location</string>
     <string name="location_intro">Enter the details to add current location to list of safe locations for login without your Smartphone.</string>
@@ -24,7 +24,7 @@
     <string name="radius_explanation">Define the length of the radius, in metres, to encompass the area which this location represents.</string>
     <string name="radius_hint">Radius</string>
     <string name="rtis">Receive Transitions Intent Service</string>
-    <string name="title_activity_geo_setter">GeoSetterActivity</string>
+    <string name="title_activity_geo_setter">Add Location Confirmation</string>
     <string name="awaiting_geo_conf">Adding Location Data</string>
     <string name="success_add_geofence">Location successfully added</string>
     <string name="fail_add_geofence">Error adding location, please try again</string>
@@ -38,5 +38,19 @@
     <string name="login_attempt">Login Attempt</string>
     <string name="login_accepted">Login Accepted</string>
     <string name="login_declined">Login Declined</string>
+    <string name="dereg_message">Remove Device Registration</string>
+    <string name="remove_message">Fill in this form if you wish to disassociate this device with your account</string>
+    <string name="remove_location_heading">Remove a Safe Location</string>
+    <string name="remove_location_intro">Enter the details to remove a named location from the list of safe locations.</string>
+    <string name="loc_hint">Location Name</string>
+    <string name="success_remove_geofence">Location successfully removed</string>
+    <string name="fail_remove_geofence">Error removing location, please try again</string>
+    <string name="login_timeout">The login attempt timed out</string>
+    <string name="login_timeout_fail">Timeout Fail</string>
+    <string name="login_accepted_subheading">You have successfully allowed the login! Please return to your browser.</string>
+    <string name="login_declined_subheading">You have successfully declined the login. Please contact your bank for more information on keeping your account secure.</string>
+    <string name="login_timeout_subheading">You took too long to respond to the login attempt, access has been declined. If you still need to log in, simply try again.</string>
+    <string name="success_dereg">Device successfully unregistered</string>
+    <string name="rereg_hint_text">If you wish to reassociate this device with your account details, or to configure it for a different user, please return to the registration page and enter the necessary information.</string>
 
 </resources>

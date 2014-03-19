@@ -33,7 +33,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 
 	String usernm, pass, regid, radius, name;
 	Button mSubmitLcn;
-	EditText mUsername, mPassword, mRadius, mName;
+	EditText mUsername, mPassword, mRadius, mName, mRemovUser, mRemovPass, mRemovLocName;
 	private int locLen;
 	private AppClient mAppClient;
 	private Location mCurrentLocation;
@@ -58,6 +58,10 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		mPassword = (EditText) findViewById(R.id.location_password);
 		mRadius = (EditText) findViewById(R.id.location_radius);
 		mName = (EditText) findViewById(R.id.location_name);
+		
+		mRemovUser = (EditText) findViewById(R.id.remove_location_username);
+		mRemovPass = (EditText) findViewById(R.id.remove_location_password);
+		mRemovLocName = (EditText) findViewById(R.id.remove_location_name);
 		
 		// Instantiate a new geofence storage area
         mGeofenceStorage = new SimpleGeofenceStore(this);
@@ -174,37 +178,30 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		} else {
 	        
 			new connectLocTask().executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, "");        
-
-//			createGeofences(mCurrentLocation.getLatitude(),
-//					mCurrentLocation.getLongitude(), Float.parseFloat(radius),
-//					name);
-
-////			launchToast("lat = "
-//					+ String.valueOf(mCurrentLocation.getLatitude())
-//					+ "long = "
-//					+ String.valueOf(mCurrentLocation.getLongitude()));
-			
-			Intent nt = new Intent(this, GeoSetterActivity.class);
-			nt.setClassName("com.example.bankauthenticator",
-					"com.example.bankauthenticator.GeoSetterActivity");
-			nt.putExtra("RADIUS_EXTRA", Float.parseFloat(radius));
-			nt.putExtra("LOCATION_NAME", name);
-			nt.putExtra("REG_ID", regid);
-			nt.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-					| Intent.FLAG_ACTIVITY_CLEAR_TOP
-					| Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(nt);
-//			
-//			createGeofences(mCurrentLocation.getLatitude(),
-//					mCurrentLocation.getLongitude(), 2000, "onConnect");
-//			getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), 2000);
-//			mLocationClient.addGeofences(mCurrentGeofences, mTransitionPendingIntent, this);
-//			
-//			getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), Float.parseFloat(radius));
-//			mLocationClient.addGeofences(mCurrentGeofences, mTransitionPendingIntent, this);
+					AsyncTask.THREAD_POOL_EXECUTOR, "addlocation");        
 		}
 
+	}
+	
+	public void submitRemoveLocationClick(View view) {
+		usernm = mRemovUser.getText().toString();
+		pass = mRemovPass.getText().toString();
+		name = mRemovLocName.getText().toString();
+		
+		radius = "0";
+		locLen = 0;
+		
+		int usernmLen = usernm.length();
+		int passLen = pass.length();
+		int nameLen = name.length();
+		
+		if (usernmLen == 0 || passLen == 0 || nameLen == 0) {
+			launchToast("Please ensure all fields have been filled out");
+		} else {
+			// Tell ApHS to remove Geofence data from database
+			new connectLocTask().executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, "delLocation");
+		}
 	}
 
 	/**
@@ -235,7 +232,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 
 			// we create a TCPClient object and pass to it all the data it
 			// needs.
-			mAppClient = new AppClient(getBaseContext(), "addlocation", locLen,
+			mAppClient = new AppClient(getBaseContext(), message[0], locLen,
 					regid, usernm, pass, radius, name, mCurrentLocation.toString(), "");
 			mAppClient.run();
 
@@ -283,10 +280,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 //					+ String.valueOf(mCurrentLocation.getLatitude())
 //					+ "long = "
 //					+ String.valueOf(mCurrentLocation.getLongitude()));
-//		createGeofences(mCurrentLocation.getLatitude(),
-//				mCurrentLocation.getLongitude(), 2000, "onConnect");
-//		getTransitionPendingIntent(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), 2000);
-//		mLocationClient.addGeofences(mCurrentGeofences, mTransitionPendingIntent, this);
 		
 	}
 
@@ -296,51 +289,4 @@ GooglePlayServicesClient.OnConnectionFailedListener{
                 Toast.LENGTH_SHORT).show();		
 //		mLocationClient = null;
 	}
-	
-	/**
-//     * Get the geofence parameters for each geofence from the UI
-//     * and add them to a List.
-//     */
-//    public void createGeofences(double latitude, double longitude, float rad, String name) {
-//        /*
-//         * Create an internal object to store the data. Set its
-//         * ID to "1". This is a "flattened" object that contains
-//         * a set of strings
-//         */
-//        SimpleGeofence mUIGeofence1 = new SimpleGeofence(name,latitude, longitude, rad);
-//        // Store this flat version
-//        mGeofenceStorage.setGeofence(name, mUIGeofence1);
-//        mCurrentGeofences.add(mUIGeofence1.toGeofence());
-//    }
-//    
-//    /*
-//     * Create a PendingIntent that triggers an IntentService in your
-//     * app when a geofence transition occurs.
-//     */
-//    private void getTransitionPendingIntent(double latitude, double longitude, float radius) {
-//        // Create an explicit Intent
-//        Intent intent = new Intent("com.aol.android.geofence.ACTION_RECEIVE_GEOFENCE");
-//        intent.setClass(this, TransitionsReceiver.class);
-//        intent.putExtra("REG_ID", regid);
-//        
-////        this.startService(intent);
-//        
-//        mTransitionPendingIntent = PendingIntent.getBroadcast(getBaseContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        
-////        mLocationManager.addProximityAlert(latitude, longitude, radius, -1, mTransitionPendingIntent);
-//    }
-//
-//	@Override
-//	public void onAddGeofencesResult(int statusCode, String[] arg1) {
-//		if (LocationStatusCodes.SUCCESS == statusCode) {
-//            Log.d("LocAct: ", "Succesful addition of Geofence");
-//            launchToast("Successful addition of Geofence");
-//            mLocationClient.disconnect();
-//        } else {
-//        	Log.e("LocAct:", "Error adding geofences");
-//        	Log.e("LocAct: ", "StatusCode = " + statusCode);
-//        	mLocationClient.disconnect();
-//        }
-//
-//	}
 }
