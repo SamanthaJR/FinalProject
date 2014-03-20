@@ -14,7 +14,7 @@ public class SuccessActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_success);
 		Intent intent = getIntent();
-		String message = intent.getStringExtra(ButtonActivity.USER_RESPONSE);
+		String message = intent.getStringExtra("USER_RESPONSE");
 		TextView t = (TextView) findViewById(R.id.success_text);
 		TextView h = (TextView) findViewById(R.id.success_heading_text);
 		if (message.equalsIgnoreCase("accept")) {
@@ -26,6 +26,12 @@ public class SuccessActivity extends Activity {
 		} else if (message.equalsIgnoreCase("Timeout")) {
 			t.setText(R.string.login_timeout_subheading);
 			h.setText(R.string.login_timeout);
+		} else if (message.equalsIgnoreCase("Dereg")) {
+			t.setText(R.string.rereg_hint_text);
+			h.setText(R.string.success_dereg);
+		} else if (message.equalsIgnoreCase("Registration")) {
+			h.setText(R.string.success_reg);
+			t.setText(R.string.return_to_add_locs);
 		}
 	}
 

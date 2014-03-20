@@ -27,7 +27,6 @@ import android.widget.Toast;
 
 public class ButtonActivity extends Activity {
 	
-	public final static String USER_RESPONSE = "com.example.bankauthenticator.RESPONSE";
 	private final int delayTime = 60000;
 	private Handler timeoutHandler = new Handler();
 
@@ -97,7 +96,7 @@ public class ButtonActivity extends Activity {
 		myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
 				| Intent.FLAG_ACTIVITY_CLEAR_TOP
 				| Intent.FLAG_ACTIVITY_NEW_TASK);
-		myIntent.putExtra(USER_RESPONSE, response);
+		myIntent.putExtra("USER_RESPONSE", response);
 		startActivity(myIntent);
 	}
 	

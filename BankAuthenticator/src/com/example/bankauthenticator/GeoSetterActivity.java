@@ -149,20 +149,6 @@ OnAddGeofencesResultListener, OnRemoveGeofencesResultListener{
 		startActivity(myIntent);
 	}
 
-	/**
-	 * Method launches a toast object.
-	 * 
-	 * @param toastMess
-	 *            - the message to be displayed in the toast.
-	 */
-	public void launchToast(String toastMess) {
-		Context context = getApplicationContext();
-		CharSequence text = toastMess;
-		int duration = Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
-	}
-
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
 		/*

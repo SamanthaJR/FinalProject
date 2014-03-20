@@ -26,8 +26,8 @@ import javax.net.ssl.*;
 public class AppClient {
 
 	private String serverMessage;
-	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
-	// public static final String SERVERIP = "147.188.195.196"; // is downstairs
+//	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
+	public static final String SERVERIP = "147.188.195.196"; // is downstairs
 	// IP
 	// public static final String SERVERIP = "147.188.195.146"; //is upstairs IP
 	public static final int SERVERPORT = 4444;
@@ -228,9 +228,10 @@ public class AppClient {
 				} else if (serverMessage
 						.equals("Succesful Registration Client")) {
 					Log.d("AC: ", serverMessage);
-					new showToast().executeOnExecutor(
-							AsyncTask.THREAD_POOL_EXECUTOR,
-							"Successfully Registered");
+//					new showToast().executeOnExecutor(
+//							AsyncTask.THREAD_POOL_EXECUTOR,
+//							"Successfully Registered");
+					startSuccessActivity("Registration");
 				} else if (serverMessage
 						.equals("Location successfully added Client")) {
 					Log.d("AC: ", serverMessage);
@@ -274,9 +275,9 @@ public class AppClient {
 				} else if (serverMessage
 						.equals("Successfully removed registration Client")) {
 					Log.d("AC: ", serverMessage);
-					new showToast().executeOnExecutor(
-							AsyncTask.THREAD_POOL_EXECUTOR,
-							"Device Registration successfully removed.");
+//					new showToast().executeOnExecutor(
+//							AsyncTask.THREAD_POOL_EXECUTOR,
+//							"Device Registration successfully removed.");
 					// read all location names in
 					// put in a list
 					// add list to intent extras for GeoSetter Activity
@@ -292,8 +293,7 @@ public class AppClient {
 								"all");
 					} else {
 						
-						// TODO start successact to confirm device de-reg.
-						//startSuccessActivity
+						startSuccessActivity("Dereg");
 					}
 				} else if (serverMessage
 						.equals("Error removing registration Client")) {
@@ -337,6 +337,17 @@ public class AppClient {
 		nt.putExtra("REG_ID", regid);
 		nt.putExtra("TASK", task);
 		nt.putExtra("DEREG_ALERT", all);
+		nt.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TOP
+				| Intent.FLAG_ACTIVITY_NEW_TASK);
+		cntx.startActivity(nt);
+	}
+	
+	private void startSuccessActivity(String resp) {
+		Intent nt = new Intent(cntx, SuccessActivity.class);
+		nt.setClassName("com.example.bankauthenticator",
+				"com.example.bankauthenticator.SuccessActivity");
+		nt.putExtra("USER_RESPONSE", resp);
 		nt.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
 				| Intent.FLAG_ACTIVITY_CLEAR_TOP
 				| Intent.FLAG_ACTIVITY_NEW_TASK);

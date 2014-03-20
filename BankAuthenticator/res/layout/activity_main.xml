@@ -37,6 +37,30 @@
         android:text="@string/location_button_string"
         android:onClick="locationClick"
         android:visibility="visible" />
+      
+      <ImageView
+        android:id="@+id/where_image"
+        android:scaleType="fitXY"
+		android:layout_width="200dp" 
+		android:layout_height="200dp"
+		android:layout_marginRight="50dp"
+		android:layout_marginBottom="20dp"
+		android:layout_alignParentRight="true"
+        android:contentDescription="@drawable/where_are_you_dark"
+        android:layout_above="@id/location_button"
+        android:src="@drawable/where_are_you_dark" />
+      
+      <ImageView
+        android:id="@+id/first_image"
+        android:scaleType="fitXY"
+		android:layout_width="200dp" 
+		android:layout_height="200dp"
+		android:layout_marginLeft="50dp"
+		android:layout_marginBottom="20dp"
+		android:layout_alignParentLeft="true"
+        android:contentDescription="@drawable/first_time_user_dark"
+        android:layout_above="@id/register_button"
+        android:src="@drawable/first_time_user_dark" />
 
       <TextView
           android:id="@+id/welc_mess"

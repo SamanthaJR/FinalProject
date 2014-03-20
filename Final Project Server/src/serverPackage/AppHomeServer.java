@@ -37,7 +37,7 @@ public class AppHomeServer {
 		// Setup a connection with the database that stores all necessary user
 		// information.
 		System.setProperty("jdbc.drivers", "org.postgresql.Driver");
-		String dbName = "jdbc:postgresql://dbteach2/bankauth";
+		String dbName = "jdbc:postgresql://dbteach2/bankauth?" + "ssl=true&"+ "sslfactory=org.postgresql.ssl.NonValidatingFactory";
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e1) {
@@ -217,7 +217,7 @@ class doComms implements Runnable {
 				}
 				closeClientConnection();
 
-				// If required to authenticate:
+				// If required to remove registration details:
 			} else if (checkMessage(task, "de-register")) {
 				System.out.println("Removing client registration");
 				
@@ -285,9 +285,7 @@ class doComms implements Runnable {
 					fireResponseEvent(false, id);
 					System.out.println("Declined login!");
 				} else {
-					removeElement();
-					// throw new
-					// UnexpectedClientMessageException("Task incorrect.");
+					fireResponseEvent(false, id);
 				}
 				closeClientConnection();
 

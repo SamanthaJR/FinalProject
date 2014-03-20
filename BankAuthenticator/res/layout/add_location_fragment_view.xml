@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<TextView
+        style="@style/HeadingFont"
+        android:id="@+id/location_heading_field"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/location_heading" />
+
+    <TextView
+        style="@style/SubHeadingFont"
+        android:id="@+id/location_intro_field"
+        android:text="@string/location_intro"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/location_heading_field" />
+    
+    <EditText
+        android:id="@+id/location_username"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/location_intro_field"
+        android:layout_marginTop="25dp"
+        android:hint="@string/user_hint"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/location_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/pass_hint"
+        android:layout_below="@+id/location_username"
+        android:inputType="textPassword" />
+    
+    <TextView
+        android:id="@+id/location_name_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/location_password"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:textColor="#00008B"
+        android:text="@string/location_name_explanation" />
+    
+    <EditText
+        android:id="@+id/location_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/location_name_hint"
+        android:layout_below="@+id/location_name_warning"
+        android:inputType="text" />
+    
+    <TextView
+        android:id="@+id/location_radius_explanation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/location_name"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:textColor="#00008B"
+        android:text="@string/radius_explanation" />
+    
+    <EditText
+        android:id="@+id/location_radius"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/radius_hint"
+        android:layout_below="@+id/location_radius_explanation"
+        android:inputType="number" />
+
+     <Button
+         android:id="@+id/location_submit_button"
+         style="@style/ButtonStyle"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_below="@+id/location_radius"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="14dp"
+        android:layout_gravity="center_horizontal"
+         android:text="@string/submit_button_string"
+         android:visibility="visible" />
+    
+    
+</LinearLayout>

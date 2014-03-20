@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/register_fragment_view"
+    android:name="com.example.bankauthenticator.RegisterFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <TextView
+        android:id="@+id/reg_mess"
+        android:layout_gravity="center_horizontal"
+        style="@style/HeadingFont"
+        android:text="@string/reg_message" />
+
+    <TextView
+        android:id="@+id/first_time_mess"
+        style="@style/SubHeadingFont"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@id/reg_mess"
+        android:text="@string/first_time_message" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/first_time_mess"
+        android:layout_marginTop="25dp"
+        android:hint="@string/username_hint"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/username"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/confirm_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password"
+        android:hint="@string/confirm_password_hint"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/submit_button"
+        style="@style/ButtonStyle"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/confirm_password"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/submit_button_string"
+        android:visibility="visible" />
+
+    </LinearLayout>

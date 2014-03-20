@@ -16,7 +16,7 @@
     <string name="title_activity_launch">Register</string>
     <string name="reg_message">Register your Device</string>
     <string name="register_button_string">Device Registration</string>
-    <string name="location_button_string">Add Safe Location</string>
+    <string name="location_button_string">Edit Safe Locations</string>
     <string name="title_activity_location">Add Current Location</string>
     <string name="location_intro">Enter the details to add current location to list of safe locations for login without your Smartphone.</string>
     <string name="location_name_explanation">Please try and come up with a name no one else will be able to guess. Titles such as \'Home\' are not advised.</string>
@@ -52,5 +52,7 @@
     <string name="login_timeout_subheading">You took too long to respond to the login attempt, access has been declined. If you still need to log in, simply try again.</string>
     <string name="success_dereg">Device successfully unregistered</string>
     <string name="rereg_hint_text">If you wish to reassociate this device with your account details, or to configure it for a different user, please return to the registration page and enter the necessary information.</string>
+    <string name="success_reg">Device Successfully Registered</string>
+    <string name="return_to_add_locs">Return to the Main Page to add Safe Locations, or proceed straight to log in.</string>
 
 </resources>

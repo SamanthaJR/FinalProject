@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/deregister_fragment_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:name="com.example.bankauthenticator.DeregisterFragment">
+    
+	<TextView
+        android:id="@+id/dereg_mess"
+        style="@style/HeadingFont"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="@string/dereg_message" />
+
+    <TextView
+        android:id="@+id/remove_mess"
+        style="@style/SubHeadingFont"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@id/dereg_mess"
+        android:text="@string/remove_message" />
+
+    <EditText
+        android:id="@+id/deregusername"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/remove_mess"
+        android:layout_marginTop="25dp"
+        android:hint="@string/user_hint"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/deregpassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/deregusername"
+        android:hint="@string/pass_hint"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/dereg_submit_button"
+        style="@style/ButtonStyle"
+        android:layout_width="170dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/deregpassword"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/submit_button_string"
+        android:visibility="visible" />
+    
+    
+</LinearLayout>
