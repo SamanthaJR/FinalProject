@@ -8,9 +8,8 @@ package serverPackage;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.sql.*;
-
-import javax.sql.*;
 
 public class ServerProtocol {
 
@@ -41,38 +40,42 @@ public class ServerProtocol {
 	 */
 	public boolean authenticate(String u, String p, String l) {
 
-		// check username and password match up correctly
-		// if not, not allowed in
-		// else get regid for username (this is the google specified
-		// registration ID for GCM services)
-		// if l not null, check database for u, p, l 
-		// if no matching location name present, not allowed in
-		// if location name present but device not in geofence, not allowed in
-		// if location name present & device in geofence, allow entry
-		// postToGCM with this regid
-		// wait for event to fire with user response
-		// allow or disallow login accordingly
 		Connection dbConn = ahs.getDBConn();
 
 		ResultSet usrnm = getUsernameAndPassFromDB(u, dbConn);
 
 		try {
+			// check username and password match up correctly
+			// if not, not allowed in
 			if (usrnm.next()) {
+				// get regid for username (this is the google specified
+				// registration ID for GCM services)
 				id = usrnm.getString(1);
 				String user = usrnm.getString(2);
 				String pass = usrnm.getString(3);
 				if (u.contentEquals(user) && p.contentEquals(pass) && l == null) {
+					// if no location name, l, provided, prompt user response via app by posting to GCMS
+					// wait for event to fire with user response
+					// allow or disallow login accordingly
 					ahs.setId(this);
 					System.out.println("SP: Posting to GCMS");
 					gcm.postToGCM(id);
 
-					try {
-						block.await();
+					try { 
+						if (!block.await(1, TimeUnit.MINUTES)){
+							System.out.println("GCMS post timed out");
+							ahs.removeElement(id);
+							return false;
+						}
 					} catch (InterruptedException e) {
 						System.out.println("Proto: ");
 						e.printStackTrace();
 						return false;
 					}
+					// if l not null, check database for username u, password p, locationName l 
+					// if no matching location name present, not allowed in
+					// if location name present but device not in geofence, not allowed in
+					// if location name present & device in geofence, allow entry
 				} else if (u.contentEquals(user) && p.contentEquals(pass) && l != null){
 					return checkLocationPresent(dbConn, l);
 				}

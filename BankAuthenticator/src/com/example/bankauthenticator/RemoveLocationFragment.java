@@ -25,21 +25,14 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
 
-public class RemoveLocationFragment extends Fragment implements
-GooglePlayServicesClient.ConnectionCallbacks,
-GooglePlayServicesClient.OnConnectionFailedListener,
-OnClickListener{
+public class RemoveLocationFragment extends Fragment implements OnClickListener{
 
 	String usernm, pass, regid, radius, name;
 	Button mSubmitLcn;
 	EditText mUsername, mPassword, mRadius, mName, mRemovUser, mRemovPass, mRemovLocName;
 	private int locLen;
-	private AppClient mAppClient;
-	private Location mCurrentLocation;
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-	public LocationClient mLocationClient;
 	List<Geofence> mCurrentGeofences;
-    private SimpleGeofenceStore mGeofenceStorage;
     PendingIntent mTransitionPendingIntent;
     IntentFilter mIntentFilter;
     
@@ -58,9 +51,6 @@ OnClickListener{
 		mSubmitLcn = (Button) fragView.findViewById(R.id.remove_location_submit_button);
 		
 		mSubmitLcn.setOnClickListener(this);
-		
-		// Instantiate a new geofence storage area
-        mGeofenceStorage = new SimpleGeofenceStore(this.getActivity());
 
 //         Instantiate the current List of geofences
         mCurrentGeofences = new ArrayList<Geofence>();
@@ -78,7 +68,6 @@ OnClickListener{
     	
     	return fragView;
     }
-
     
     public void submitRemoveLocationClick(View view) {
 		usernm = mRemovUser.getText().toString();
@@ -95,9 +84,11 @@ OnClickListener{
 		if (usernmLen == 0 || passLen == 0 || nameLen == 0) {
 			launchToast("Please ensure all fields have been filled out");
 		} else {
-			// Tell ApHS to remove Geofence data from database
-			new connectLocTask().executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, "delLocation");
+			// Tell ApHS to remove Geofence data from database			
+			ConnectTask connt = new ConnectTask(getActivity(), "delLocation", locLen,
+					regid, usernm, pass, radius, name, "", "");
+			
+			connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 		}
 	}
 
@@ -114,76 +105,6 @@ OnClickListener{
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
 	}
-
-	/**
-	 * External class that is removed from the UI thread that instantiates a new
-	 * AppClient object and calls its run() method.
-	 * 
-	 * @author sjr090
-	 * 
-	 */
-	public class connectLocTask extends AsyncTask<String, String, AppClient> {
-
-		@Override
-		protected AppClient doInBackground(String... message) {
-
-			// we create a TCPClient object and pass to it all the data it
-			// needs.
-			mAppClient = new AppClient(getActivity().getBaseContext(), message[0], locLen,
-					regid, usernm, pass, radius, name, mCurrentLocation.toString(), "");
-			mAppClient.run();
-
-			return null;
-		}
-
-	}
-
-	@Override
-	public void onConnectionFailed(ConnectionResult connectionResult) {
-		/*
-         * Google Play services can resolve some errors it detects.
-         * If the error has a resolution, try sending an Intent to
-         * start a Google Play services activity that can resolve
-         * error.
-         */
-        if (connectionResult.hasResolution()) {
-            try {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(this.getActivity(), CONNECTION_FAILURE_RESOLUTION_REQUEST);
-                /*
-                 * Thrown if Google Play services canceled the original
-                 * PendingIntent
-                 */
-            } catch (IntentSender.SendIntentException e) {
-                // Log the error
-                e.printStackTrace();
-            }
-        } else {
-            /*
-             * If no resolution is available, display a dialog to the
-             * user with the error.
-             */
-            Log.e("LocAct", Integer.toString(connectionResult.getErrorCode()));
-        }
-    }
-
-
-	@Override
-	public void onConnected(Bundle arg0) {
-//		launchToast("Location Services connected!");
-
-		mCurrentLocation = mLocationClient.getLastLocation();
-//		launchToast("lat = "
-//					+ String.valueOf(mCurrentLocation.getLatitude())
-//					+ "long = "
-//					+ String.valueOf(mCurrentLocation.getLongitude()));
-		
-	}
-
-	@Override
-	public void onDisconnected() {
-	}
-
 
 	@Override
 	public void onClick(View v) {

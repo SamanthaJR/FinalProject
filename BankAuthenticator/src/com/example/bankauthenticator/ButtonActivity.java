@@ -4,14 +4,6 @@
  */
 package com.example.bankauthenticator;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,13 +15,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class ButtonActivity extends Activity {
-	
+
 	private final int delayTime = 60000;
 	private Handler timeoutHandler = new Handler();
-
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
@@ -45,7 +35,10 @@ public class ButtonActivity extends Activity {
 		acc.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// Stop the timeout as the user has responded
 				timeoutHandler.removeCallbacks(timeoutTask);
+				// Signal the server that the user has accepted the login. This
+				// must be done off the main UI Thread.
 				SendTask st = new SendTask();
 				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Accepted");
 				startSuccessAct("accept");
@@ -57,24 +50,27 @@ public class ButtonActivity extends Activity {
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// Stop the timeout as the user has responded
 				timeoutHandler.removeCallbacks(timeoutTask);
+				// Signal the server that the user has declined the login. This
+				// must be done off the main UI Thread.
 				SendTask st = new SendTask();
 				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Declined");
-				startSuccessAct("decline");	
+				startSuccessAct("decline");
 			}
 		});
 
 	}
-	
+
 	/*
-     * Called when the Activity becomes visible.
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //start the timeout feature
-        timeoutHandler.postDelayed(timeoutTask, delayTime);
-    }
+	 * Called when the Activity becomes visible.
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// start the timeout feature
+		timeoutHandler.postDelayed(timeoutTask, delayTime);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,7 +79,7 @@ public class ButtonActivity extends Activity {
 	}
 
 	/**
-	 * Method that starts a new activity to alert the user that they have
+	 * Method that starts a new SuccessActivity to alert the user that they have
 	 * successfully input their response to the login.
 	 * 
 	 * @param response
@@ -99,10 +95,15 @@ public class ButtonActivity extends Activity {
 		myIntent.putExtra("USER_RESPONSE", response);
 		startActivity(myIntent);
 	}
-	
-	private class SendTask extends AsyncTask<String, Void, Void> {
-		CharSequence text;
 
+	/**
+	 * An Asynchronous Task that sends a message to the AppHomeServer containing
+	 * the user's response to the login attempt.
+	 * 
+	 * @author sjr090
+	 * 
+	 */
+	private class SendTask extends AsyncTask<String, Void, Void> {
 		@Override
 		protected Void doInBackground(String... params) {
 			Log.d("BAsync", "Executing message send");
@@ -111,12 +112,16 @@ public class ButtonActivity extends Activity {
 		}
 
 	}
-	
+
+	/**
+	 * The timer that runs in the background in order for the Activity to
+	 * implement a Timeout in case the user abandons the login attempt.
+	 */
 	private Runnable timeoutTask = new Runnable() {
 		public void run() {
 			finish();
 			startSuccessAct("Timeout");
 		}
 	};
-	
+
 }

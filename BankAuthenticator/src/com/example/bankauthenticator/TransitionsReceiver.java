@@ -58,49 +58,20 @@ public class TransitionsReceiver extends BroadcastReceiver {
 
 				regid = intent.getStringExtra("REG_ID");
 				if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
-					String[] temp = new String[] {triggerIds[0], "enter in"};
 					Log.d("TBR: ", "Enter in");
-					new connectGeoTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, temp);
+					ConnectTask connt = new ConnectTask(context, "locationing", 0, regid, "", "", "", triggerIds[0], "", "enter in");
+					connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
+					
 				} else {
-					String[] temp = new String[] {triggerIds[0], "exit out"};
+					
 					Log.d("TBR: ", "Exit out");
-					new connectGeoTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,temp);
+					
+					ConnectTask connt = new ConnectTask(context,
+							"locationing", 0, regid, "", "", "", triggerIds[0], "", "exit out");
+					
+					connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 				}
 			}
-		}
-	}
-
-	/**
-	 * AsyncTask class that creates a new AppClient on a new thread and sets it
-	 * running to make the connection to the server. It initiates the object
-	 * with the values required to send the correct messages for updating
-	 * geofence info.
-	 * 
-	 * @author sjr090
-	 * 
-	 */
-	class connectGeoTask extends AsyncTask<String, String, AppClient> {
-
-		@Override
-		protected AppClient doInBackground(String... message) {
-			String name = message[0];
-			String transType = message[1];
-			AppClient mAppClient = new AppClient(context,
-					"locationing", 0, regid, "", "", "", name, "", transType);
-			mAppClient.run();
-
-			return null;
-		}
-	}
-	
-	private class debugToast extends AsyncTask<String, Void, CharSequence> {
-
-		@Override
-		protected CharSequence doInBackground(String... params) {
-			int duration = Toast.LENGTH_SHORT;
-			Toast toast = Toast.makeText(context, params[0], duration);
-			toast.show();
-			return null;
 		}
 	}
 }

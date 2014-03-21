@@ -1,7 +1,9 @@
+/**
+ * Class is a child class of the android Fragment that displays a layout that allows the 
+ * user to register their device
+ */
 package com.example.bankauthenticator;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,14 +12,13 @@ import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class RegisterFragment extends Fragment implements OnClickListener{
 	
-	Button mSubmitBtn;
-	EditText mUsername, mPassword, mConfPass;
-	String usernm, pass, regid;
-	int regLen;
+	private Button mSubmitBtn;
+	private EditText mUsername, mPassword, mConfPass;
+	public String nUsernm, mPass, mRegid;
+	private int mRegLen;
 
 	
 	@Override
@@ -29,7 +30,7 @@ public class RegisterFragment extends Fragment implements OnClickListener{
 		View fragView = inflater.inflate(R.layout.register_fragment_view, container, false);
 		
 		Bundle args = getArguments();
-		regid = args.getString("REG_ID");
+		mRegid = args.getString("REG_ID");
 		
 
 		mUsername = (EditText) fragView.findViewById(R.id.username);
@@ -39,7 +40,6 @@ public class RegisterFragment extends Fragment implements OnClickListener{
 		
 		mSubmitBtn.setOnClickListener(this);
 		
-        // Inflate the layout for this fragment
         return fragView;
     }
 	
@@ -54,68 +54,43 @@ public class RegisterFragment extends Fragment implements OnClickListener{
 	 */
 	public void submitFragClick(View view) {
 
-		usernm = mUsername.getText().toString();
-		pass = mPassword.getText().toString();
+		nUsernm = mUsername.getText().toString();
+		mPass = mPassword.getText().toString();
 		String cPass = mConfPass.getText().toString();
 
-		if (usernm.length() == 0 || pass.length() == 0 || cPass.length() == 0) {
-			launchToast("Please ensure all fields are filled out.");
+		if (nUsernm.length() == 0 || mPass.length() == 0 || cPass.length() == 0) {
+			// Tell the user that all EditText fields need to be filled out.
+			AlertUserFragment aluf = new AlertUserFragment();
+			Bundle args = new Bundle();
+			args.putString("MESSAGE", "Please ensure all fields are filled out.");
+			aluf.setArguments(args);
+			aluf.show(getActivity().getSupportFragmentManager(), "Fill out");
 		} else {
 
-			if (!pass.equals(cPass)) {
-
-				launchToast("Make sure you have typed your password correctly!");
-
+			if (!mPass.equals(cPass)) {
+				// If the user has entered two different values for their password,
+				// prompt re-entry of information.
+				AlertUserFragment aluf = new AlertUserFragment();
+				Bundle args = new Bundle();
+				args.putString("MESSAGE", "Make sure you have typed your password correctly!");
+				aluf.setArguments(args);
+				aluf.show(getActivity().getSupportFragmentManager(), "Fill out");
+				// Clear EditText fields.
 				mPassword.setText("");
 				mConfPass.setText("");
 			} else {
-				// calc lengths of vals from text zones
-				int usernmLen = usernm.length();
-				int passLen = pass.length();
-				regLen = 183 + usernmLen + passLen + 2;
+				// calculate the lengths of the values in the EditText fields.
+				int usernmLen = nUsernm.length();
+				int passLen = mPass.length();
+				mRegLen = 183 + usernmLen + passLen + 2;
 
-				new connectRegTask().execute("registering");
+				ConnectTask connt = new ConnectTask(getActivity(), "registering", mRegLen,
+						mRegid, nUsernm, mPass, "", "", "", "");
+				
+				connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 			}
 		}
 	}
-
-	/**
-	 * Method launches a toast object.
-	 * 
-	 * @param toastMess
-	 *            - the message to be displayed in the toast.
-	 */
-	public void launchToast(String toastMess) {
-		Context context = getActivity().getApplicationContext();
-		CharSequence text = toastMess;
-		int duration = Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
-	}
-	
-	/**
-	 * External class that is removed from the UI thread that instantiates a new
-	 * AppClient object and calls its run() method.
-	 * 
-	 * @author sjr090
-	 * 
-	 */
-	public class connectRegTask extends AsyncTask<String, String, AppClient> {
-
-		@Override
-		protected AppClient doInBackground(String... message) {
-
-			// we create a TCPClient object and pass to it all the data it
-			// needs.
-			AppClient appclient = new AppClient(getActivity().getApplicationContext(), message[0], regLen,
-					regid, usernm, pass, "", "", "", "");
-			appclient.run();
-
-			return null;
-		}
-
-	}
-
 	@Override
 	public void onClick(View v) {
 		submitFragClick(v);

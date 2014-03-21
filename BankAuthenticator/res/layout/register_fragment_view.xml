@@ -16,14 +16,12 @@
         android:id="@+id/first_time_mess"
         style="@style/SubHeadingFont"
         android:layout_gravity="center_horizontal"
-        android:layout_below="@id/reg_mess"
         android:text="@string/first_time_message" />
 
     <EditText
         android:id="@+id/username"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/first_time_mess"
         android:layout_marginTop="25dp"
         android:hint="@string/username_hint"
         android:inputType="text" />
@@ -32,7 +30,6 @@
         android:id="@+id/password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/username"
         android:hint="@string/password_hint"
         android:inputType="textPassword" />
 
@@ -40,7 +37,6 @@
         android:id="@+id/confirm_password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/password"
         android:hint="@string/confirm_password_hint"
         android:inputType="textPassword" />
 
@@ -50,9 +46,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="170dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/confirm_password"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_marginTop="50dp"
         android:text="@string/submit_button_string"
         android:visibility="visible" />

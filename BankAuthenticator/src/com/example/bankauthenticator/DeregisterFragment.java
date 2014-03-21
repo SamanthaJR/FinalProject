@@ -1,6 +1,9 @@
+/**
+ * Class is a child class of the android Fragment that displays a layout that allows the 
+ * user to request that the program removes all registration details for their device
+ */
 package com.example.bankauthenticator;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,14 +13,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class DeregisterFragment extends Fragment implements OnClickListener {
 	
-	String regid, usernm, pass;
-	EditText mDeregUsername, mDeregPass;
-	Button mSubmitButn;
-	int regLen;
+	private String mRegid, mUsernm, mPass;
+	private EditText mDeregUsername, mDeregPass;
+	private Button mSubmitButn;
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,65 +33,36 @@ public class DeregisterFragment extends Fragment implements OnClickListener {
 		mSubmitButn.setOnClickListener(this);
 		
 		Bundle args = getArguments();
-		regid = args.getString("REG_ID");
+		mRegid = args.getString("REG_ID");
 		
 		return fragView;
 	}
 	
+	/**
+	 * Customised onClick method for the submit button. It creates an ConnectTask object,
+	 * gives it all the correct information for a de-reigster action, and tells it to run.
+	 * @param view
+	 */
 	public void deregSubmitClick(View view) {
 
-		usernm = mDeregUsername.getText().toString();
-		pass = mDeregPass.getText().toString();
+		mUsernm = mDeregUsername.getText().toString();
+		mPass = mDeregPass.getText().toString();
 
-		if (usernm.length() == 0 || pass.length() == 0 ) {
-			launchToast("Please ensure all fields are filled out.");
+		if (mUsernm.length() == 0 || mPass.length() == 0 ) {
+			
+			AlertUserFragment aluf = new AlertUserFragment();
+			Bundle args = new Bundle();
+			args.putString("MESSAGE", "Please ensure all fields are filled out.");
+			aluf.setArguments(args);
+			aluf.show(getActivity().getSupportFragmentManager(), "Fill out de-reg");
+			
 		} else {
 
-			
-				// calc lengths of vals from text zones
-				int usernmLen = usernm.length();
-				int passLen = pass.length();
-				regLen = 183 + usernmLen + passLen + 2;
+				ConnectTask connt = new ConnectTask(getActivity(), "de-register", 0,
+						mRegid, mUsernm, mPass, "", "", "", "");
 				
-				new connectRegTask().execute("de-register");
+				connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 		}
-	}
-
-	/**
-	 * Method launches a toast object.
-	 * 
-	 * @param toastMess
-	 *            - the message to be displayed in the toast.
-	 */
-	public void launchToast(String toastMess) {
-		Context context = getActivity().getApplicationContext();
-		CharSequence text = toastMess;
-		int duration = Toast.LENGTH_SHORT;
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
-	}
-
-	/**
-	 * External class that is removed from the UI thread that instantiates a new
-	 * AppClient object and calls its run() method.
-	 * 
-	 * @author sjr090
-	 * 
-	 */
-	public class connectRegTask extends AsyncTask<String, String, AppClient> {
-
-		@Override
-		protected AppClient doInBackground(String... message) {
-
-			// we create a TCPClient object and pass to it all the data it
-			// needs.
-			AppClient appClient = new AppClient(getActivity().getApplicationContext(), message[0], regLen,
-					regid, usernm, pass, "", "", "", "");
-			appClient.run();
-
-			return null;
-		}
-
 	}
 
 	@Override

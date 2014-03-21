@@ -32,6 +32,9 @@ public class SuccessActivity extends Activity {
 		} else if (message.equalsIgnoreCase("Registration")) {
 			h.setText(R.string.success_reg);
 			t.setText(R.string.return_to_add_locs);
+		} else if (message.equalsIgnoreCase("Fail")) {
+			h.setText(R.string.success_fail);
+			t.setText(R.string.return_fail_sub);
 		}
 	}
 

@@ -11,24 +11,19 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Button;
 
 public class GcmBroadcastReceiver extends BroadcastReceiver {
 	static final String TAG = "BankAuthenticator";
 	public static final int NOTIFICATION_ID = 1;
 	private NotificationManager mNotificationManager;
-	NotificationCompat.Builder builder;
-	Context context;
+	public NotificationCompat.Builder builder;
+	public Context mContext;
 	public static AppClient mAppClient;
-	Button acc;
-	Button dec;
 	static String loginAccepted = "Wait";
-	String regid;
+	public String mRegid;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -36,7 +31,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		Log.d("BroadcastReceiver", "onReceive method called");
 
 		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-		this.context = context;
+		this.mContext = context;
 		String messageType = gcm.getMessageType(intent);
 		if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
 			sendNotification("Send error: " + intent.getExtras().toString());
@@ -46,14 +41,27 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 					+ intent.getExtras().toString());
 		} else {
 
+			// Get the device's registrationId. Due to the way that information
+			// is passed around
+			// android, this is best received by extracting it from the message
+			// sent from the GCMS.
 			String temp = intent.getExtras().toString();
 			String[] locateRegid = temp.split("regid=");
-			regid = locateRegid[1].substring(0, 183); // 183 or 182?
+			mRegid = locateRegid[1].substring(0, 183);
 
-			new connectTask().execute("");
+			// Create and run a new AppClient object to tell the AppHomeServer
+			// that it is
+			// authenticating a login attempt. Due to the fact that messages
+			// need to be sent
+			// through this same app client, the generic ConnectTask object
+			// cannot be used.
+			new ConnectGCMBRTask().executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, "");
 
 			sendNotification("Please Accept or Decline attempt.");
 
+			// Launch the ButtonActivity that prompts the user to accept or
+			// decline the login attempt.
 			Intent myIntent = new Intent(context.getApplicationContext(),
 					ButtonActivity.class);
 			myIntent.setClassName("com.example.bankauthenticator",
@@ -69,21 +77,21 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 	}
 
 	/**
-	 * Method called after the GCM message received which creates and posts a
+	 * Method called after the GCM message is received which creates and posts a
 	 * notification.
 	 * 
 	 * @param msg
 	 *            - the message we wish to post in the notification.
 	 */
 	public void sendNotification(String msg) {
-		mNotificationManager = (NotificationManager) context
+		mNotificationManager = (NotificationManager) mContext
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
-				new Intent(context, MainActivity.class), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0,
+				new Intent(mContext, MainActivity.class), 0);
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				context).setSmallIcon(R.drawable.ic_menu_securelock)
+				mContext).setSmallIcon(R.drawable.ic_menu_securelock)
 				.setContentTitle("New Log In Attempt").setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
@@ -98,11 +106,12 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 	 * @author sjr090
 	 * 
 	 */
-	public class connectTask extends AsyncTask<String, String, AppClient> {
+	public class ConnectGCMBRTask extends AsyncTask<String, String, AppClient> {
 
 		@Override
 		protected AppClient doInBackground(String... message) {
-			mAppClient = new AppClient(context, "authenticating", 0, regid, "", "", "", "", "", "");
+			mAppClient = new AppClient(mContext, "authenticating", 0, mRegid, "",
+					"", "", "", "", "");
 			mAppClient.run();
 
 			return null;

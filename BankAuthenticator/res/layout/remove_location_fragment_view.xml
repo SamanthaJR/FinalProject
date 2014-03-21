@@ -8,22 +8,18 @@
         style="@style/HeadingFont"
         android:id="@+id/remove_location_heading_field"
         android:text="@string/remove_location_heading"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_below="@+id/location_submit_button" />
+        android:layout_gravity="center_horizontal"/>
 
     <TextView
         style="@style/SubHeadingFont"
         android:id="@+id/remove_location_intro_field"
         android:text="@string/remove_location_intro"
-        android:layout_gravity="center_horizontal"
-        android:layout_below="@+id/remove_location_heading_field" />
+        android:layout_gravity="center_horizontal"/>
     
     <EditText
         android:id="@+id/remove_location_username"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/remove_location_intro_field"
         android:layout_marginTop="25dp"
         android:hint="@string/user_hint"
         android:inputType="text" />
@@ -33,7 +29,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/pass_hint"
-        android:layout_below="@+id/remove_location_username"
         android:inputType="textPassword" />
     
     <EditText
@@ -41,16 +36,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/loc_hint"
-        android:layout_below="@+id/remove_location_password"
         android:inputType="text" />
     
     <Button
          android:id="@+id/remove_location_submit_button"
          style="@style/ButtonStyle"
          android:layout_height="wrap_content"
-         android:layout_below="@+id/remove_location_name"
-         android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
+       	 android:layout_gravity="center_horizontal"
          android:layout_marginTop="14dp"
          android:text="@string/submit_button_string"
          android:visibility="visible" />

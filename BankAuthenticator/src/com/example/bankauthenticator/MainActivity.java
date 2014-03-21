@@ -27,7 +27,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bankauthenticator.GcmBroadcastReceiver.connectTask;
 import com.google.android.gms.common.*;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 

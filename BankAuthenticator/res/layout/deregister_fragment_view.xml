@@ -17,14 +17,12 @@
         android:id="@+id/remove_mess"
         style="@style/SubHeadingFont"
         android:layout_gravity="center_horizontal"
-        android:layout_below="@id/dereg_mess"
         android:text="@string/remove_message" />
 
     <EditText
         android:id="@+id/deregusername"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/remove_mess"
         android:layout_marginTop="25dp"
         android:hint="@string/user_hint"
         android:inputType="text" />
@@ -33,7 +31,6 @@
         android:id="@+id/deregpassword"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/deregusername"
         android:hint="@string/pass_hint"
         android:inputType="textPassword" />
 
@@ -43,9 +40,6 @@
         android:layout_width="170dp"
         android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content"
-        android:layout_below="@id/deregpassword"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:layout_marginTop="50dp"
         android:text="@string/submit_button_string"
         android:visibility="visible" />

@@ -5,21 +5,16 @@ package serverPackage;
  * Communicates login and registration requests with the same protocol.
  */
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import javax.sql.*;
-
-import org.eclipse.jetty.server.Authentication.SendSuccess;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,11 +28,15 @@ public class AppHomeServer {
 	public static LinkedList<ServerProtocol> listenerQueue = new LinkedList<ServerProtocol>();
 	private Connection dbConn;
 
+	/**
+	 * Method called that simply starts the server running.
+	 */
 	public void startServer() {
-		// Setup a connection with the database that stores all necessary user
-		// information.
+		// Setup a secure connection with the database that stores all necessary
+		// user information.
 		System.setProperty("jdbc.drivers", "org.postgresql.Driver");
-		String dbName = "jdbc:postgresql://dbteach2/bankauth?" + "ssl=true&"+ "sslfactory=org.postgresql.ssl.NonValidatingFactory";
+		String dbName = "jdbc:postgresql://dbteach2/bankauth?" + "ssl=true&"
+				+ "sslfactory=org.postgresql.ssl.NonValidatingFactory";
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e1) {
@@ -52,9 +51,11 @@ public class AppHomeServer {
 		}
 
 		try {
-//			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/.java/deployment/security/trusted.certs");
-			System.setProperty("javax.net.ssl.trustStore", "/home/students/sjr090/work/SSC2/DBex2/Final Project Server/trusted.certs");
-			
+			// Declare the location of the trust store so the server knows which
+			// client certificates it can trust.
+			System.setProperty("javax.net.ssl.trustStore",
+					"/home/students/sjr090/work/SSC2/DBex2/Final Project Server/trusted.certs");
+
 			// Setup a secure TCP socket.
 			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory
 					.getDefault();
@@ -64,13 +65,11 @@ public class AppHomeServer {
 			System.out.println("AHS: Started, Listening to port 4444");
 			SSLSocket server;
 
-			// ServerSocket listener = new ServerSocket(4444);
-			// Socket server = new Socket();
-
 			while (true) {
 				server = (SSLSocket) listener.accept();
 				System.out.println("AHS: AppClient accepted.");
 
+				// Start the timeout in case the user simply abandons the app.
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				doComms t = new doComms(server, dbConn);
 				Future<?> future = executor.submit(t);
@@ -82,7 +81,6 @@ public class AppHomeServer {
 				} catch (TimeoutException e) {
 					System.out.println("Terminated!");
 					t.fireResponseEvent(false, t.getRegid());
-					t.removeElement();
 					t.closeClientConnection();
 				} catch (InterruptedException e) {
 					System.out.println("Interrupted!");
@@ -119,6 +117,32 @@ public class AppHomeServer {
 	 */
 	public Connection getDBConn() {
 		return dbConn;
+	}
+
+	/**
+	 * Method removed a ServerProtocol from the list if it is still present
+	 * after a timeout. Only used in rare scenarios where we want to remove an
+	 * item from the list without updating the webpage, usually
+	 * fireResponseEvent() is preferred.
+	 * 
+	 * @param rl
+	 *            - the ServerProtocol object to be removed.
+	 */
+	public void removeElement(String regid) {
+		ListIterator<ServerProtocol> it = listenerQueue.listIterator();
+		if (it.hasNext()) {
+			ServerProtocol tempProto = (ServerProtocol) it.next();
+			while (it.hasNext()
+					&& !tempProto.getId().equalsIgnoreCase(
+							String.valueOf(regid))) {
+				tempProto = (ServerProtocol) it.next();
+			}
+			if (tempProto.getId().equalsIgnoreCase(String.valueOf(regid))) {
+				// remove element
+				it.remove();
+				System.out.println("Login Request Removed from List");
+			}
+		}
 	}
 
 }
@@ -184,7 +208,7 @@ class doComms implements Runnable {
 				details = new char[length];
 				is.read(details, 0, length);
 				String regDetails = String.valueOf(details);
-//				System.out.println(regDetails);
+				// System.out.println(regDetails);
 				String[] regDetArr = regDetails.split("\\^");
 
 				ResultSet regidSet = checkRegDetails(regDetArr[0]);
@@ -220,55 +244,56 @@ class doComms implements Runnable {
 				// If required to remove registration details:
 			} else if (checkMessage(task, "de-register")) {
 				System.out.println("Removing client registration");
-				
+
 				is.read(len, 0, 3);
 				System.out.println(Integer.parseInt(new String(len)));
 				int length = Integer.parseInt(new String(len));
 				details = new char[length];
 				is.read(details, 0, length);
 				String regDetails = String.valueOf(details);
-//				System.out.println(regDetails);
+				// System.out.println(regDetails);
 				String[] regDetArr = regDetails.split("\\^");
-				
+
 				// check password regid and username all correct
 				// if not, return a message to client saying to try again
 				// if so, remove details, send message to client saying success
-				if(passUserMatch(regDetArr[1], regDetArr[2], regDetArr[0])){
-					//read all location names under this regid
-					//send number of location names back to client
-					//send all location names back to client
-					//remove all location names under this regid from locations table
+				if (passUserMatch(regDetArr[1], regDetArr[2], regDetArr[0])) {
+					// read all location names under this regid
+					// send number of location names back to client
+					// send all location names back to client
 					ArrayList<String> allLocs = getAllUserLocationNames(regDetArr[0]);
-					out.println("Successfully removed registration Client");
+					out.println("Removing registration Client");
 					int noOfLocs = allLocs.size();
 					out.println(noOfLocs);
-					for(int j = 0; j < noOfLocs; j++){
+					for (int j = 0; j < noOfLocs; j++) {
 						out.println(allLocs.get(j));
 					}
+					// remove all location names under this regid from locations
+					// table
 					removeAllUserLocs(regDetArr[0]);
-					removeReg(regDetArr[0]);		
+					// remove all user details from userinfo table
+					removeReg(regDetArr[0]);
 				} else {
 					ResultSet rset = checkRegDetails(regDetArr[0]);
 					try {
-						if(rset.next()){
-						out.println("Login details incorrect Client");
+						if (rset.next()) {
+							out.println("Login details incorrect Client");
 						} else {
 							out.println("Successfully removed registration Client");
 						}
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				
+
 				closeClientConnection();
-				
+
 			} else if (checkMessage(task, "user log in")) {
 				System.out.println("Authenticating");
 				// read registration id
 				is.read(regid, 0, 183);
 				String id = String.valueOf(regid);
-//				System.out.println(id);
+				// System.out.println(id);
 				System.out.println("Waiting for response");
 
 				// read accept or decline
@@ -276,15 +301,21 @@ class doComms implements Runnable {
 				System.out.println(String.valueOf(resp));
 				System.out.println("Message received:" + String.valueOf(resp));
 
+				// If user allowed login, fire event that lets ServerProtocol
+				// object know the response.
 				if (checkMessage(resp, "Accepted")) {
 					AppHomeServer.decision = "true";
 					fireResponseEvent(true, id);
 					System.out.println("Accepted login!");
+					// If user disallow login, fire event that lets
+					// ServerProtocol object know the response.
 				} else if (checkMessage(resp, "Declined")) {
 					AppHomeServer.decision = "false";
 					fireResponseEvent(false, id);
 					System.out.println("Declined login!");
 				} else {
+					// If something untoward happens, such as user closing app
+					// without sending a response, disallow login.
 					fireResponseEvent(false, id);
 				}
 				closeClientConnection();
@@ -317,6 +348,8 @@ class doComms implements Runnable {
 								out.println("Login Details Incorrect Client");
 								System.out.println("Username Taken Client");
 							} else {
+								// check that all the account details are
+								// correct and match up together
 								boolean check = passUserMatch(username,
 										password, String.valueOf(regid));
 								if (!check) {
@@ -324,12 +357,18 @@ class doComms implements Runnable {
 									System.out
 											.println("Adding location, Password and Username do not match.");
 								} else {
+									// Checks if the user already has another
+									// location saved with the same location
+									// name.
 									if (locNameTaken(locName,
 											String.valueOf(regid))) {
 										out.println("Location name taken Client");
 										System.out
 												.println("Location name taken.");
 									} else {
+										// If the details pass all of the above
+										// checks, add new location details to
+										// the database.
 										addLocation(String.valueOf(regid),
 												username, password, locName,
 												locRad, location);
@@ -348,13 +387,14 @@ class doComms implements Runnable {
 				}
 				closeClientConnection();
 			} else if (checkMessage(task, "delLocation")) {
+				// If required to delete a user's location.
 				is.read(regid, 0, 183);
 				String username = readLocVal();
 				String password = readLocVal();
 				String locName = readLocVal();
-				
-				ResultSet regidSet = checkRegDetails(String.valueOf(regid));
 
+				ResultSet regidSet = checkRegDetails(String.valueOf(regid));
+				// Check if Device Registration ID is present.
 				if (regidSet != null) {
 					try {
 						if (!regidSet.next()) {
@@ -362,11 +402,13 @@ class doComms implements Runnable {
 							System.out.println("Device not Registered Client");
 						} else {
 							ResultSet userSet = checkUsernmDetails(username);
-							// if username already taken, statement is true
+							// if username present, statement is true
 							if (!userSet.next()) {
 								out.println("Login Details Incorrect Client");
 								System.out.println("Username Taken Client");
 							} else {
+								// Check that all authentication details
+								// provided match up.
 								boolean check = passUserMatch(username,
 										password, String.valueOf(regid));
 								if (!check) {
@@ -374,12 +416,17 @@ class doComms implements Runnable {
 									System.out
 											.println("Adding location, Password and Username do not match.");
 								} else {
-										deleteLocation(String.valueOf(regid),
-												username, password, locName);
-//										out.println("Location successfully deleted Client");
-										System.out
-												.println("Location successfully deleted");
-									
+									// If info passes all of the above checks,
+									// remove the necessary location from the
+									// database.
+									// Note that removing the actual Geofences
+									// themselves is done on the App side.
+									deleteLocation(String.valueOf(regid),
+											username, password, locName);
+									// out.println("Location successfully deleted Client");
+									System.out
+											.println("Location successfully deleted");
+
 								}
 							}
 						}
@@ -390,9 +437,9 @@ class doComms implements Runnable {
 					}
 				}
 				closeClientConnection();
-				
-				
+
 			} else if (checkMessage(task, "locationing")) {
+				// If a user walks in or out of a Geofence
 				System.out.println("locationing");
 				is.read(regid, 0, 183);
 				String reg_id = String.valueOf(regid);
@@ -412,11 +459,20 @@ class doComms implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	private void removeAllUserLocs(String reg){
+
+	/**
+	 * When a user removes their account, all location info saved for them needs
+	 * to be deleted, this method does that.
+	 * 
+	 * @param reg
+	 *            - the registrationID of the user that is requesting to remove
+	 *            their registration details.
+	 */
+	private void removeAllUserLocs(String reg) {
 		try {
 			PreparedStatement stmnt = dbConn
-					.prepareStatement("DELETE FROM locations" + " WHERE reg_id = ?");
+					.prepareStatement("DELETE FROM locations"
+							+ " WHERE reg_id = ?");
 			stmnt.setString(1, reg);
 			stmnt.executeUpdate();
 		} catch (SQLException e) {
@@ -425,28 +481,53 @@ class doComms implements Runnable {
 		}
 	}
 
+	/**
+	 * When the user removes their account, the app needs to know all the
+	 * Geofences associated with the device so that it can remove them. This
+	 * method retrieves all the location names so that the server can send them
+	 * back to the app to remove.
+	 * 
+	 * @param reg
+	 *            - the RegistrationId of the user's device
+	 * @return - an ArrayList containing the names of all their location names.
+	 */
 	private ArrayList<String> getAllUserLocationNames(String reg) {
 		PreparedStatement stmnt;
 		try {
 			stmnt = dbConn
-					.prepareStatement("SELECT location_name FROM locations" + " WHERE reg_id= ?");
+					.prepareStatement("SELECT location_name FROM locations"
+							+ " WHERE reg_id= ?");
 			stmnt.setString(1, reg);
 			ResultSet set = stmnt.executeQuery();
 			ArrayList<String> returnStrings = new ArrayList<String>();
-			while(set.next()){
+			while (set.next()) {
 				returnStrings.add(set.getString("location_name"));
 			}
 			return returnStrings;
 		} catch (SQLException e) {
 			System.out.println("AHS: Problem selecting all user locations");
 			e.printStackTrace();
-			return null;		
+			return null;
 		}
-		
+
 	}
 
-	private void deleteLocation(String reg, String username,
-			String password, String locName) {
+	/**
+	 * Method deletes a field representing a Safe Location from the locations
+	 * table in the database.
+	 * 
+	 * @param reg
+	 *            - the registrationID of the user specifying the location
+	 *            removal
+	 * @param username
+	 *            - the username of the user specifying the location removal
+	 * @param password
+	 *            - the password of the user specifying the location removal
+	 * @param locName
+	 *            - the location name of the Safe Location to delete
+	 */
+	private void deleteLocation(String reg, String username, String password,
+			String locName) {
 		try {
 			PreparedStatement stmnt = dbConn
 					.prepareStatement("DELETE FROM locations WHERE reg_id = ? AND username = ? AND password = ? AND location_name = ?");
@@ -457,13 +538,19 @@ class doComms implements Runnable {
 			stmnt.executeUpdate();
 			out.println("Successfully removed location Client");
 		} catch (SQLException e) {
-			System.out
-			.println("AHS: " + "Problem removing location info");
+			System.out.println("AHS: " + "Problem removing location info");
 			e.printStackTrace();
 			out.println("Error removing location Client");
 		}
 	}
 
+	/**
+	 * Method to remove all user details from the userinfo table so that a user
+	 * may unregister their device.
+	 * 
+	 * @param reg
+	 *            - the registrationId of the device to remove.
+	 */
 	private void removeReg(String reg) {
 		try {
 			PreparedStatement stmnt = dbConn
@@ -472,14 +559,19 @@ class doComms implements Runnable {
 			stmnt.executeUpdate();
 			out.println("Successfully removed registration Client");
 		} catch (SQLException e) {
-			System.out
-			.println("AHS: " + "Problem removing registration info");
+			System.out.println("AHS: " + "Problem removing registration info");
 			e.printStackTrace();
 			out.println("Error removing registration Client");
 		}
 	}
 
-	public String getRegid(){
+	/**
+	 * Getter method that returns the String value of the char[] containing the
+	 * unique RegistrationId of a device.
+	 * 
+	 * @return - a String containing the RegistrationId.
+	 */
+	public String getRegid() {
 		return String.valueOf(regid);
 	}
 
@@ -509,7 +601,7 @@ class doComms implements Runnable {
 			} else {
 				stmnt.setBoolean(1, false);
 			}
-//			System.out.println(stmnt.toString());
+			// System.out.println(stmnt.toString());
 			stmnt.executeUpdate();
 		} catch (SQLException e) {
 			System.out
@@ -529,7 +621,7 @@ class doComms implements Runnable {
 			int uLen = Integer.parseInt(String.valueOf(radLen));
 			// System.out.println("uLen is: " + String.valueOf(uLen));
 			is.read(locInfo, 0, uLen);
-//			System.out.println(String.valueOf(locInfo));
+			// System.out.println(String.valueOf(locInfo));
 			String info = "";
 			for (int i = 0; i < uLen; i++) {
 				info += locInfo[i];
@@ -551,8 +643,7 @@ class doComms implements Runnable {
 	 * @param username
 	 * @param password
 	 * @param locName
-	 *            - the name that the user has decided to call this new
-	 *            location
+	 *            - the name that the user has decided to call this new location
 	 * @param locRad
 	 *            - the radius to set the size of the location
 	 * @param location
@@ -599,12 +690,13 @@ class doComms implements Runnable {
 					+ "WHERE password = ?  AND user_name = ? AND reg_id = ?");
 			passDetails.setString(1, pass);
 			passDetails.setString(2, user);
-			passDetails.setString(3,  regid);
+			passDetails.setString(3, regid);
 			ResultSet rs = passDetails.executeQuery();
 			return rs.next();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// e.printStackTrace();
+			System.out
+					.println("AHS: Error checking username and password match");
 			return false;
 		}
 	}
@@ -692,8 +784,9 @@ class doComms implements Runnable {
 			System.out.println(b);
 			return (b);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out
+					.println("AHS: Problem checking whether a location name is taken");
+			// e.printStackTrace();
 			return true;
 		}
 	}
@@ -718,7 +811,7 @@ class doComms implements Runnable {
 
 		} catch (SQLException e) {
 			System.out
-					.println("AHSThread: Problem creating or executing SQL Statement 1");
+					.println("AHSThread: Problem creating or executing SQL Statement checkRegDetails");
 			e.printStackTrace();
 		}
 		return null;
@@ -745,7 +838,7 @@ class doComms implements Runnable {
 
 		} catch (SQLException e) {
 			System.out
-					.println("AHSThread: Problem creating or executing SQL Statement 2");
+					.println("AHSThread: Problem creating or executing SQL Statement CheckUsernmDetails");
 			e.printStackTrace();
 		}
 		return null;
@@ -786,28 +879,4 @@ class doComms implements Runnable {
 
 	}
 
-	/**
-	 * Method removed a ServerProtocol from the list if it is still present
-	 * after a timeout.
-	 * 
-	 * @param rl
-	 *            - the ServerProtocol object to be removed.
-	 */
-	public void removeElement() {
-		ListIterator<ServerProtocol> it = AppHomeServer.listenerQueue
-				.listIterator();
-		if (it.hasNext()) {
-			ServerProtocol tempProto = (ServerProtocol) it.next();
-			while (it.hasNext()
-					&& !tempProto.getId().equalsIgnoreCase(
-							String.valueOf(regid))) {
-				tempProto = (ServerProtocol) it.next();
-			}
-			if (tempProto.getId().equalsIgnoreCase(String.valueOf(regid))) {
-				// remove element
-				it.remove();
-				System.out.println("Login Request Removed from List");
-			}
-		}
-	}
 }

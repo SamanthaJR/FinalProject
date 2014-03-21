@@ -54,5 +54,8 @@
     <string name="rereg_hint_text">If you wish to reassociate this device with your account details, or to configure it for a different user, please return to the registration page and enter the necessary information.</string>
     <string name="success_reg">Device Successfully Registered</string>
     <string name="return_to_add_locs">Return to the Main Page to add Safe Locations, or proceed straight to log in.</string>
+    <string name="success_fail">Sorry, something went wrong!</string>
+    <string name="return_fail_sub">Don\'t worry, no one can access your account. The most likely cause is that you are not connected to the internet, please check your connection, wait 1 minute, and try again.</string>
+    <string name="ok">Ok</string>
 
 </resources>
