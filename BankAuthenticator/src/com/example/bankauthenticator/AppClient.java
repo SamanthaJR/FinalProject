@@ -23,8 +23,8 @@ import javax.net.ssl.*;
 public class AppClient {
 
 	private String serverMessage;
-	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
-	// public static final String SERVERIP = "147.188.195.196"; // is -12037 IP
+//	public static final String SERVERIP = "147.188.195.197"; // is -12038 IP
+	public static final String SERVERIP = "147.188.195.196"; // is -12037 IP
 	// public static final String SERVERIP = "147.188.195.146"; //is upstairs IP
 	public static final int SERVERPORT = 4444;
 	private boolean mRun = false;
@@ -309,6 +309,11 @@ public class AppClient {
 				} else if (serverMessage
 						.equals("Successfully removed registration Client")) {
 					stopClient();
+				} else if (serverMessage
+						.equals("Location does not exist Client")) {
+					new ShowDialog()
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+							"This location does not exist, please make sure you have typed it properly and try again.");
 				}
 			}
 
@@ -393,8 +398,9 @@ public class AppClient {
 	}
 
 	/**
-	 * Class used to display a DialogFragment message on the UI thread. It takes in a
-	 * String on creation that dictates the nature of the message displayed.
+	 * Class used to display a DialogFragment message on the UI thread. It takes
+	 * in a String on creation that dictates the nature of the message
+	 * displayed.
 	 * 
 	 * @author sjr090
 	 * 
@@ -403,7 +409,7 @@ public class AppClient {
 		CharSequence text;
 		AlertUserFragment aluf;
 
-		//Set the message to be displayed
+		// Set the message to be displayed
 		@Override
 		protected CharSequence doInBackground(String... params) {
 			text = params[0];
@@ -428,8 +434,10 @@ public class AppClient {
 		// Show the DialogFragment.
 		@Override
 		protected void onPostExecute(CharSequence text) {
-			FragmentActivity frag = (FragmentActivity) cntx;
-			aluf.show(frag.getSupportFragmentManager(), "Fill out Location");
+			if (cntx instanceof FragmentActivity) {
+				FragmentActivity frag = (FragmentActivity) cntx;
+				aluf.show(frag.getSupportFragmentManager(), "AppClient" + text);
+			}
 		}
 
 	}

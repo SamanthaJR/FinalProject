@@ -1,3 +1,7 @@
+/**
+ * Class triggered by a Geofence transition. It simply connects to the AppHomeServer
+ * and alerts it, telling it to change the information present in its database.
+ */
 package com.example.bankauthenticator;
 
 import java.util.List;
@@ -10,36 +14,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 public class TransitionsReceiver extends BroadcastReceiver {
 	
-	String regid;
-	Context context;
+	public String regid;
+	public Context context;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d("TBR: ", "Handling transition intent");
-//		List<Geofence> triggersList = LocationClient
-//				.getTriggeringGeofences(intent);
-//		Log.d("TBR: ", triggersList.toString());
-//		new debugToast().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Handling transition intent");
 		this.context = context;
 		// First check for errors
 		if (LocationClient.hasError(intent)) {
-			// Get the error code with a static method
+			// Get the error code
 			int errorCode = LocationClient.getErrorCode(intent);
-			// Log the error
+			
 			Log.e("ReceiveTransitionsIntentService",
 					"Location Services error: " + Integer.toString(errorCode));
-			/*
-			 * You can also send the error code to an Activity or Fragment with
-			 * a broadcast Intent
-			 */
-			/*
-			 * If there's no error, get the transition type and the IDs of the
-			 * geofence or geofences that triggered the transition
-			 */
 		} else {
 			// Get the type of transition (entry or exit)
 			int transitionType = LocationClient.getGeofenceTransition(intent);
@@ -57,18 +48,18 @@ public class TransitionsReceiver extends BroadcastReceiver {
 				}
 
 				regid = intent.getStringExtra("REG_ID");
+				
 				if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
+					// Let the AppHomeServer know that the user has entered a Geofence
 					Log.d("TBR: ", "Enter in");
 					ConnectTask connt = new ConnectTask(context, "locationing", 0, regid, "", "", "", triggerIds[0], "", "enter in");
 					connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 					
 				} else {
-					
+					// Let the AppHomeServer know that the user has exited a Geofence
 					Log.d("TBR: ", "Exit out");
-					
 					ConnectTask connt = new ConnectTask(context,
-							"locationing", 0, regid, "", "", "", triggerIds[0], "", "exit out");
-					
+							"locationing", 0, regid, "", "", "", triggerIds[0], "", "exit out");			
 					connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 				}
 			}

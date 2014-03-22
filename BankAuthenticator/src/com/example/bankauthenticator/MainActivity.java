@@ -1,8 +1,12 @@
+/**
+ * Main Activity class for the app which is launched on app start, it checks that all the
+ * necessary requirements for the Google Play Services api are present.
+ * 
+ * Copyright (C) 2013 The Android Open Source Project
+ * 
+ */
 package com.example.bankauthenticator;
 
-/**
- * Main Activity class for the app which is launched on app start.
- */
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,22 +14,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Configuration;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.*;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -41,7 +39,6 @@ public class MainActivity extends Activity {
 	public static String loginAccepted;
 	static final String TAG = "BankAuthenticator";
 	public static final int NOTIFICATION_ID = 1;
-	private NotificationManager mNotificationManager;
 	NotificationCompat.Builder builder;
 	Context ctx;
 
@@ -61,8 +58,8 @@ public class MainActivity extends Activity {
 		context = getApplicationContext();
 		regid = getRegistrationId(context);
 		System.out.println(regid);
-		TextView dispID = (TextView) findViewById(R.id.display);
-		dispID.setText(regid);
+//		TextView dispID = (TextView) findViewById(R.id.display);
+//		dispID.setText(regid);
 
 		if (checkPlay()) {
 			gcm = GoogleCloudMessaging.getInstance(this);
@@ -222,6 +219,8 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	// @author Samantha Rouse, Student Id 1071890
+	
 	public void registerClick(View view){
 		Intent myIntent = new Intent(this, LaunchActivity.class);
 		myIntent.setClassName("com.example.bankauthenticator",

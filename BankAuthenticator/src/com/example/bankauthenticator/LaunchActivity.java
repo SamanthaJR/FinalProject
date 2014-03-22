@@ -1,29 +1,24 @@
+/**
+ * Activity class that controls the Register and Deregister functionality by loading two fragments.
+ */
 package com.example.bankauthenticator;
 
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
 public class LaunchActivity extends FragmentActivity {
 
-	private AppClient mAppClient;
-	String regid;
-	DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
-	ViewPager mViewPager;
+	public String regid;
+	private RegisterFragmentPagerAdapter mRegisterFragmentPagerAdapter;
+	private ViewPager mViewPager;
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
@@ -31,21 +26,19 @@ public class LaunchActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_launch);
 		
+		// Add tabs to the Actionbar
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
-		// ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-        mDemoCollectionPagerAdapter =
-                new DemoCollectionPagerAdapter(getSupportFragmentManager());
+		// Add the swipe functionality
+        mRegisterFragmentPagerAdapter =
+                new RegisterFragmentPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.register_pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setAdapter(mRegisterFragmentPagerAdapter);
         mViewPager.setOnPageChangeListener(
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
                     public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
                         getActionBar().setSelectedNavigationItem(position);
                     }
                 });
@@ -63,8 +56,6 @@ public class LaunchActivity extends FragmentActivity {
 			@Override
 			public void onTabReselected(Tab arg0,
 					android.app.FragmentTransaction arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
@@ -79,8 +70,6 @@ public class LaunchActivity extends FragmentActivity {
 			@Override
 			public void onTabUnselected(Tab arg0,
 					android.app.FragmentTransaction arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 	    };
 
@@ -94,8 +83,6 @@ public class LaunchActivity extends FragmentActivity {
 	                actionBar.newTab()
 	                        .setText("De-register")
 	                        .setTabListener(tabListener));
-	    	
-		
 		
 		
 		
@@ -103,13 +90,18 @@ public class LaunchActivity extends FragmentActivity {
 		regid = intent.getStringExtra("USER_REGID");
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		
 	}
 	
 
-	public class DemoCollectionPagerAdapter extends FragmentPagerAdapter {
-	    public DemoCollectionPagerAdapter(FragmentManager fm) {
+	/**
+	 * FragmentPagerAdapter class that loads a RegisterFragment in the first tab
+	 * and a DeregisterFragment in the second tab.
+	 * 
+	 * @author sjr090
+	 *
+	 */
+	public class RegisterFragmentPagerAdapter extends FragmentPagerAdapter {
+	    public RegisterFragmentPagerAdapter(FragmentManager fm) {
 	        super(fm);
 	    }
 
@@ -117,11 +109,13 @@ public class LaunchActivity extends FragmentActivity {
 	    public Fragment getItem(int i) {
 	    	Fragment fragment;
 	    	if(i == 0){
+	    		// return RegisterFragment.
 	    		fragment = new RegisterFragment();
 	        	Bundle args = new Bundle();
 	        	args.putString("REG_ID", regid);
 	        	fragment.setArguments(args);
 	    	} else {
+	    		// return DeregisterFragment.
 	    		fragment = new DeregisterFragment();
 		        Bundle args = new Bundle();
 		        args.putString("REG_ID", regid);
@@ -130,6 +124,7 @@ public class LaunchActivity extends FragmentActivity {
 	    	return fragment;
 	    }
 
+	    // Number of tabs
 	    @Override
 	    public int getCount() {
 	        return 2;
@@ -164,6 +159,7 @@ public class LaunchActivity extends FragmentActivity {
 	    return super.onOptionsItemSelected(item);
 	}
 	
+	// Return to the MainActivity.
 	@Override
 	  public void onBackPressed(){
 		Intent myIntent = new Intent(this, MainActivity.class);

@@ -26,7 +26,7 @@ public class AppHomeServer {
 
 	public static String decision;
 	public static LinkedList<ServerProtocol> listenerQueue = new LinkedList<ServerProtocol>();
-	private Connection dbConn;
+	Connection dbConn;
 
 	/**
 	 * Method called that simply starts the server running.
@@ -69,27 +69,10 @@ public class AppHomeServer {
 				server = (SSLSocket) listener.accept();
 				System.out.println("AHS: AppClient accepted.");
 
-				// Start the timeout in case the user simply abandons the app.
-				ExecutorService executor = Executors.newSingleThreadExecutor();
+				// Start the timeout in case the user simply abandons the app
 				doComms t = new doComms(server, dbConn);
-				Future<?> future = executor.submit(t);
-
-				try {
-					System.out.println("Started..");
-					System.out.println(future.get(1, TimeUnit.MINUTES));
-					System.out.println("Finished!");
-				} catch (TimeoutException e) {
-					System.out.println("Terminated!");
-					t.fireResponseEvent(false, t.getRegid());
-					t.closeClientConnection();
-				} catch (InterruptedException e) {
-					System.out.println("Interrupted!");
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					System.out.println("Execution.");
-					e.printStackTrace();
-				}
-				executor.shutdownNow();
+				Thread th = new Thread(t);
+				th.start();
 			}
 
 		} catch (IOException ioe) {
@@ -345,8 +328,8 @@ class doComms implements Runnable {
 							ResultSet userSet = checkUsernmDetails(username);
 							// if username already taken, statement is true
 							if (!userSet.next()) {
-								out.println("Login Details Incorrect Client");
-								System.out.println("Username Taken Client");
+								out.println("Login details incorrect Client");
+								System.out.println("Login Details Incorrect Client");
 							} else {
 								// check that all the account details are
 								// correct and match up together
@@ -404,8 +387,8 @@ class doComms implements Runnable {
 							ResultSet userSet = checkUsernmDetails(username);
 							// if username present, statement is true
 							if (!userSet.next()) {
-								out.println("Login Details Incorrect Client");
-								System.out.println("Username Taken Client");
+								out.println("Login details incorrect Client");
+								System.out.println("Username or pass incorrect Client");
 							} else {
 								// Check that all authentication details
 								// provided match up.
@@ -414,7 +397,11 @@ class doComms implements Runnable {
 								if (!check) {
 									out.println("Login details incorrect Client");
 									System.out
-											.println("Adding location, Password and Username do not match.");
+											.println("Removing location, Password and Username do not match.");
+								} else if (locationNotPresent(locName, getRegid())){
+									out.println("Location does not exist Client");
+									System.out
+											.println("Location does not exist Client.");
 								} else {
 									// If info passes all of the above checks,
 									// remove the necessary location from the
@@ -453,10 +440,37 @@ class doComms implements Runnable {
 			}
 		} catch (IOException ioe) {
 			System.out.println("IOException on socket listen: " + ioe);
-			ioe.printStackTrace();
+//			ioe.printStackTrace();
+			fireResponseEvent(false, getRegid());
 		} catch (UnexpectedClientMessageException e) {
 			System.out.println("Unexpected Client response");
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method checks if there is already a Safe Location saved under a specific name saved for a particular user
+	 * @param locName - the Safe Location's name
+	 * @param regid2 - the user's unique RegistrationId.
+	 * @return - false if the user has a location already saved under this name, true otherwise
+	 */
+	private boolean locationNotPresent(String locName, String regid2) {
+		try {
+			PreparedStatement stmnt = dbConn
+					.prepareStatement("SELECT * FROM locations"
+							+ " WHERE reg_id = ? AND location_name = ?");
+			stmnt.setString(1, regid2);
+			stmnt.setString(2, locName);
+			ResultSet rs = stmnt.executeQuery();
+			if(rs.next()){
+				return false;
+			} else {
+				return true;
+			}
+		} catch (SQLException e) {
+			System.out.println("AHS: Problem deleting all user locations");
+			e.printStackTrace();
+			return false;
 		}
 	}
 

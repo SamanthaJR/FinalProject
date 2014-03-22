@@ -39,6 +39,7 @@ public class ButtonActivity extends Activity {
 				timeoutHandler.removeCallbacks(timeoutTask);
 				// Signal the server that the user has accepted the login. This
 				// must be done off the main UI Thread.
+				Log.d("ButtAct: ", "Accept Button Clicked");
 				SendTask st = new SendTask();
 				st.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Accepted");
 				startSuccessAct("accept");
@@ -50,6 +51,7 @@ public class ButtonActivity extends Activity {
 		dec.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				Log.d("ButtAct: ", "Decline Button Clicked");
 				// Stop the timeout as the user has responded
 				timeoutHandler.removeCallbacks(timeoutTask);
 				// Signal the server that the user has declined the login. This
@@ -124,4 +126,8 @@ public class ButtonActivity extends Activity {
 		}
 	};
 
+	
+	@Override
+	  public void onBackPressed(){}
+	
 }

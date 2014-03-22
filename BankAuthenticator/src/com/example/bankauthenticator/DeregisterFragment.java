@@ -56,12 +56,15 @@ public class DeregisterFragment extends Fragment implements OnClickListener {
 			aluf.setArguments(args);
 			aluf.show(getActivity().getSupportFragmentManager(), "Fill out de-reg");
 			
+			
 		} else {
 
-				ConnectTask connt = new ConnectTask(getActivity(), "de-register", 0,
-						mRegid, mUsernm, mPass, "", "", "", "");
-				
-				connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
+			int locLen = mUsernm.length() + mPass.length() + mRegid.length() + 2;
+			
+			ConnectTask connt = new ConnectTask(getActivity(), "de-register",
+					locLen, mRegid, mUsernm, mPass, "", "", "", "");
+
+			connt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Void[0]);
 		}
 	}
 

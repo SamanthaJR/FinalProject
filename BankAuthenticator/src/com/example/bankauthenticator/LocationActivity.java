@@ -1,27 +1,15 @@
 package com.example.bankauthenticator;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import com.example.bankauthenticator.LaunchActivity.DemoCollectionPagerAdapter;
-import com.google.android.gms.common.*;
 import com.google.android.gms.location.*;
-import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
-
-import android.location.*;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ActionBar.Tab;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -29,10 +17,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.os.Build;
 
 public class LocationActivity extends FragmentActivity {
@@ -40,16 +26,11 @@ public class LocationActivity extends FragmentActivity {
 	String usernm, pass, regid, radius, name;
 	Button mSubmitLcn;
 	EditText mUsername, mPassword, mRadius, mName, mRemovUser, mRemovPass, mRemovLocName;
-	private int locLen;
-	private AppClient mAppClient;
-	private Location mCurrentLocation;
-	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	public LocationClient mLocationClient;
 	List<Geofence> mCurrentGeofences;
-    private SimpleGeofenceStore mGeofenceStorage;
     PendingIntent mTransitionPendingIntent;
     IntentFilter mIntentFilter;
-	DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
+	LocationFragmentPagerAdapter mLocationPagerAdapter;
 	ViewPager mViewPager;
 	
 	@Override
@@ -57,18 +38,18 @@ public class LocationActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_location);
 		
+		// Enable the Actionbar to load tabs
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
 		Intent intent = getIntent();
 		regid = intent.getStringExtra("USER_REGID");
 		
-		// ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-        mDemoCollectionPagerAdapter =
-                new DemoCollectionPagerAdapter(getSupportFragmentManager());
+		// Enable the swipe functionality
+        mLocationPagerAdapter =
+                new LocationFragmentPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.location_pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setAdapter(mLocationPagerAdapter);
         mViewPager.setOnPageChangeListener(
                 new ViewPager.SimpleOnPageChangeListener() {
                     @Override
@@ -77,14 +58,7 @@ public class LocationActivity extends FragmentActivity {
                         // corresponding tab.
                         getActionBar().setSelectedNavigationItem(position);
                     }
-                });
-
-		
-		
-		
-		
-
-		
+                });		
 		
 		 // Create a tab listener that is called when the user changes tabs.
 	    ActionBar.TabListener tabListener = new ActionBar.TabListener() {
@@ -92,8 +66,6 @@ public class LocationActivity extends FragmentActivity {
 			@Override
 			public void onTabReselected(Tab arg0,
 					android.app.FragmentTransaction arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
@@ -108,12 +80,9 @@ public class LocationActivity extends FragmentActivity {
 			@Override
 			public void onTabUnselected(Tab arg0,
 					android.app.FragmentTransaction arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 	    };
 
-	 
 	        actionBar.addTab(
 	                actionBar.newTab()
 	                        .setText("Add Current Location")
@@ -126,13 +95,16 @@ public class LocationActivity extends FragmentActivity {
 	  
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-		
 	}
-	
 
-	public class DemoCollectionPagerAdapter extends FragmentPagerAdapter {
-	    public DemoCollectionPagerAdapter(FragmentManager fm) {
+	/**
+	 * FragmentPagerAdapter class that loads an AddLocationFragment in the first tab
+	 * and a RemoveLocationFragment in the second tab.
+	 * @author sjr090
+	 *
+	 */
+	public class LocationFragmentPagerAdapter extends FragmentPagerAdapter {
+	    public LocationFragmentPagerAdapter(FragmentManager fm) {
 	        super(fm);
 	    }
 
@@ -140,11 +112,13 @@ public class LocationActivity extends FragmentActivity {
 	    public Fragment getItem(int i) {
 	    	Fragment fragment;
 	    	if(i == 0){
+	    		// Return an AddLocationFragment
 	    		fragment = new AddLocationFragment();
 	        	Bundle args = new Bundle();
 	        	args.putString("REG_ID", regid);
 	        	fragment.setArguments(args);
 	    	} else {
+	    		// Return a RemoveLocationFragment
 	    		fragment = new RemoveLocationFragment();
 		        Bundle args = new Bundle();
 		        args.putString("REG_ID", regid);
@@ -153,6 +127,7 @@ public class LocationActivity extends FragmentActivity {
 	    	return fragment;
 	    }
 
+	    // There are 2 tabs.
 	    @Override
 	    public int getCount() {
 	        return 2;
@@ -168,10 +143,6 @@ public class LocationActivity extends FragmentActivity {
 	    }
 	}
 
-	
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private void setupActionBar() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -190,19 +161,13 @@ public class LocationActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 	
+	// Return to MainActivity
 	@Override
 	  public void onBackPressed(){
 		Intent myIntent = new Intent(this, MainActivity.class);

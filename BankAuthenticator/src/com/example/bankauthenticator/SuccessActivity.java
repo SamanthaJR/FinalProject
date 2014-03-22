@@ -1,9 +1,11 @@
+/**
+ * Activity Class launched as a confirmation to the user.
+ */
 package com.example.bankauthenticator;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
@@ -11,6 +13,8 @@ public class SuccessActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// Choose what text to display, depending on what parameters where
+		// passed in on start up.
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_success);
 		Intent intent = getIntent();

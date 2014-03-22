@@ -66,7 +66,7 @@ public class ServerProtocol {
 							System.out.println("GCMS post timed out");
 							ahs.removeElement(id);
 							return false;
-						}
+							}
 					} catch (InterruptedException e) {
 						System.out.println("Proto: ");
 						e.printStackTrace();
