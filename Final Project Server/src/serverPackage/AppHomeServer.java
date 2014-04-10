@@ -27,6 +27,7 @@ public class AppHomeServer {
 	public static String decision;
 	public static LinkedList<ServerProtocol> listenerQueue = new LinkedList<ServerProtocol>();
 	Connection dbConn;
+	private static final String TRUST_STORE = "/home/students/sjr090/work/SSC2/DBex2/Final Project Server/trusted.certs";
 
 	/**
 	 * Method called that simply starts the server running.
@@ -53,8 +54,7 @@ public class AppHomeServer {
 		try {
 			// Declare the location of the trust store so the server knows which
 			// client certificates it can trust.
-			System.setProperty("javax.net.ssl.trustStore",
-					"/home/students/sjr090/work/SSC2/DBex2/Final Project Server/trusted.certs");
+			System.setProperty("javax.net.ssl.trustStore", TRUST_STORE);
 
 			// Setup a secure TCP socket.
 			SSLServerSocketFactory factory = (SSLServerSocketFactory) SSLServerSocketFactory
